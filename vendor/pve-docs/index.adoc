@@ -1,0 +1,51 @@
+image:./images/proxmox-logo.svg[] pass:[<br>] {pve} Documentation Index
+=======================================================================
+:data-uri:
+:icons:
+:title: {pve} Documentation Index
+
+
+{pve} Administration Guide
+--------------------------
+
+You can browse the link:pve-admin-guide.html[administration guide as a single-page HTML document].
+
+
+You can also download the guide in the following formats:
+
+* link:pve-admin-guide.pdf[PDF file]
+* link:pve-admin-guide.epub[E-book (ePub)]
+
+
+Individual Chapters
+-------------------
+
+include::chapter-index-table.adoc[]
+
+
+{pve} Manual Pages
+------------------
+
+Command-line Interface
+~~~~~~~~~~~~~~~~~~~~~~
+
+include::man1-index-table.adoc[]
+
+
+Service Daemons
+~~~~~~~~~~~~~~~
+
+include::man8-index-table.adoc[]
+
+
+Configuration Options
+~~~~~~~~~~~~~~~~~~~~~
+
+include::man5-index-table.adoc[]
+
+
+API Viewer
+~~~~~~~~~~
+
+The link:api-viewer/index.html[API viewer] is a tiny web application
+which allows you to inspect all available API calls.

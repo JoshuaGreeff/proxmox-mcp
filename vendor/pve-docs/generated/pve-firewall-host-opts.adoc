@@ -1,0 +1,76 @@
+`enable`: `<boolean>` ('default =' `1`)::
+
+Enable host firewall rules.
+
+`log_level_forward`: `<alert | crit | debug | emerg | err | info | nolog | notice | warning>` ::
+
+Log level for forwarded traffic.
+
+`log_level_in`: `<alert | crit | debug | emerg | err | info | nolog | notice | warning>` ::
+
+Log level for incoming traffic.
+
+`log_level_out`: `<alert | crit | debug | emerg | err | info | nolog | notice | warning>` ::
+
+Log level for outgoing traffic.
+
+`log_nf_conntrack`: `<boolean>` ('default =' `0`)::
+
+Enable logging of conntrack information.
+
+`ndp`: `<boolean>` ('default =' `1`)::
+
+Enable NDP (Neighbor Discovery Protocol).
+
+`nf_conntrack_allow_invalid`: `<boolean>` ('default =' `0`)::
+
+Allow invalid packets on connection tracking.
+
+`nf_conntrack_helpers`: `<string>` ('default =' ``)::
+
+Enable conntrack helpers for specific protocols. Supported protocols: amanda, ftp, irc, netbios-ns, pptp, sane, sip, snmp, tftp
+
+`nf_conntrack_max`: `<integer> (32768 - N)` ('default =' `262144`)::
+
+Maximum number of tracked connections.
+
+`nf_conntrack_tcp_timeout_established`: `<integer> (7875 - N)` ('default =' `432000`)::
+
+Conntrack established timeout.
+
+`nf_conntrack_tcp_timeout_syn_recv`: `<integer> (30 - 60)` ('default =' `60`)::
+
+Conntrack syn recv timeout.
+
+`nftables`: `<boolean>` ('default =' `0`)::
+
+Enable nftables based firewall (tech preview)
+
+`nosmurfs`: `<boolean>` ::
+
+Enable SMURFS filter.
+
+`protection_synflood`: `<boolean>` ('default =' `0`)::
+
+Enable synflood protection
+
+`protection_synflood_burst`: `<integer>` ('default =' `1000`)::
+
+Synflood protection rate burst by ip src.
+
+`protection_synflood_rate`: `<integer>` ('default =' `200`)::
+
+Synflood protection rate syn/sec by ip src.
+
+`smurf_log_level`: `<alert | crit | debug | emerg | err | info | nolog | notice | warning>` ::
+
+Log level for SMURFS filter.
+
+`tcp_flags_log_level`: `<alert | crit | debug | emerg | err | info | nolog | notice | warning>` ::
+
+Log level for illegal tcp flags filter.
+
+`tcpflags`: `<boolean>` ('default =' `0`)::
+
+Filter illegal combinations of TCP flags.
+

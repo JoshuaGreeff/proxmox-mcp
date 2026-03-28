@@ -1,0 +1,4 @@
+GNU Free Documentation License
+==============================
+
+include::LICENSE[]

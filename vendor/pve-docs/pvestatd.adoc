@@ -1,0 +1,30 @@
+ifdef::manvolnum[]
+pvestatd(8)
+===========
+:pve-toplevel:
+
+NAME
+----
+
+pvestatd - PVE Status Daemon
+
+SYNOPSIS
+--------
+
+include::generated/pvestatd.8-synopsis.adoc[]
+
+DESCRIPTION
+-----------
+endif::manvolnum[]
+
+ifndef::manvolnum[]
+pvestatd - Proxmox VE Status Daemon
+===================================
+endif::manvolnum[]
+
+This daemon queries the status of VMs, storages and containers at
+regular intervals. The result is sent to all nodes in the cluster.
+
+ifdef::manvolnum[]
+include::pve-copyright.adoc[]
+endif::manvolnum[]

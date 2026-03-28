@@ -1,0 +1,30 @@
+ifdef::manvolnum[]
+pve-ha-lrm(8)
+=============
+:pve-toplevel:
+
+NAME
+----
+
+pve-ha-lrm - PVE Local Resource Manager Daemon
+
+
+SYNOPSIS
+--------
+
+include::generated/pve-ha-lrm.8-synopsis.adoc[]
+
+DESCRIPTION
+-----------
+endif::manvolnum[]
+
+ifndef::manvolnum[]
+Local Resource Manager Daemon
+==============================
+endif::manvolnum[]
+
+This is the Local Resource Manager Daemon.
+
+ifdef::manvolnum[]
+include::pve-copyright.adoc[]
+endif::manvolnum[]

@@ -1,0 +1,151 @@
+:fn-ceph-user-mgmt: footnote:cephusermgmt[Ceph user management {cephdocs-url}/rados/operations/user-management/]
+[[ceph_rados_block_devices]]
+Ceph RADOS Block Devices (RBD)
+------------------------------
+ifdef::wiki[]
+:pve-toplevel:
+:title: Storage: RBD
+endif::wiki[]
+
+Storage pool type: `rbd`
+
+https://ceph.com[Ceph] is a distributed object store and file system
+designed to provide excellent performance, reliability and
+scalability. RADOS block devices implement a feature rich block level
+storage, and you get the following advantages:
+
+* thin provisioning
+* resizable volumes
+* distributed and redundant (striped over multiple OSDs)
+* full snapshot and clone capabilities
+* self healing
+* no single point of failure
+* scalable to the exabyte level
+* kernel and user space implementation available
+
+NOTE: For smaller deployments, it is also possible to run Ceph
+services directly on your {pve} nodes. Recent hardware has plenty
+of CPU power and RAM, so running storage services and VMs on same node
+is possible.
+
+[[storage_rbd_config]]
+Configuration
+~~~~~~~~~~~~~
+
+This backend supports the common storage properties `nodes`,
+`disable`, `content`, and the following `rbd` specific properties:
+
+monhost::
+
+List of monitor daemon IPs. Optional, only needed if Ceph is not running on the
+{pve} cluster.
+
+pool::
+
+Ceph pool name.
+
+username::
+
+RBD user ID. Optional, only needed if Ceph is not running on the {pve} cluster.
+Note that only the user ID should be used. The "client." type prefix must be
+left out.
+
+krbd::
+
+Enforce access to rados block devices through the krbd kernel module. Optional.
+
+NOTE: Containers will use `krbd` independent of the option value.
+
+.Configuration Example for a external Ceph cluster (`/etc/pve/storage.cfg`)
+----
+rbd: ceph-external
+        monhost 10.1.1.20 10.1.1.21 10.1.1.22
+        pool ceph-external
+        content images
+        username admin
+----
+
+TIP: You can use the `rbd` utility to do low-level management tasks.
+
+Authentication
+~~~~~~~~~~~~~~
+
+NOTE: If Ceph is installed locally on the {pve} cluster, the following is done
+automatically when adding the storage.
+
+If you use `cephx` authentication, which is enabled by default, you need to
+provide the keyring from the external Ceph cluster.
+
+To configure the storage via the CLI, you first need to make the file
+containing the keyring available. One way is to copy the file from the external
+Ceph cluster directly to one of the {pve} nodes. The following example will
+copy it to the `/root` directory of the node on which we run it:
+
+----
+# scp <external cephserver>:/etc/ceph/ceph.client.admin.keyring /root/rbd.keyring
+----
+
+Then use the `pvesm` CLI tool to configure the external RBD storage, use the
+`--keyring` parameter, which needs to be a path to the keyring file that you
+copied.  For example:
+
+----
+# pvesm add rbd <name> --monhost "10.1.1.20 10.1.1.21 10.1.1.22" --content images --keyring /root/rbd.keyring
+----
+
+When configuring an external RBD storage via the GUI, you can copy and paste
+the keyring into the appropriate field.
+
+The keyring will be stored at
+
+----
+# /etc/pve/priv/ceph/<STORAGE_ID>.keyring
+----
+
+TIP: Creating a keyring with only the needed capabilities is recommend when
+connecting to an external cluster. For further information on Ceph user
+management, see the Ceph docs.footnoteref:[cephusermgmt,{cephdocs-url}/rados/operations/user-management/[Ceph User Management]]
+
+Ceph client configuration (optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Connecting to an external Ceph storage doesn't always allow setting
+client-specific options in the config DB on the external cluster. You can add a
+`ceph.conf` beside the Ceph keyring to change the Ceph client configuration for
+the storage.
+
+The ceph.conf needs to have the same name as the storage.
+
+----
+# /etc/pve/priv/ceph/<STORAGE_ID>.conf
+----
+
+See the RBD configuration reference footnote:[RBD configuration reference
+{cephdocs-url}/rbd/rbd-config-ref/] for possible settings.
+
+NOTE: Do not change these settings lightly. {PVE} is merging the
+<STORAGE_ID>.conf with the storage configuration.
+
+
+Storage Features
+~~~~~~~~~~~~~~~~
+
+The `rbd` backend is a block level storage, and implements full
+snapshot and clone functionality.
+
+.Storage features for backend `rbd`
+[width="100%",cols="m,m,3*d",options="header"]
+|==============================================================================
+|Content types  |Image formats  |Shared |Snapshots |Clones
+|images rootdir |raw            |yes    |yes       |yes
+|==============================================================================
+
+ifdef::wiki[]
+
+See Also
+~~~~~~~~
+
+* link:/wiki/Storage[Storage]
+
+endif::wiki[]
+

@@ -1,0 +1,153 @@
+[[storage_lvm]]
+LVM Backend
+-----------
+ifdef::wiki[]
+:pve-toplevel:
+:title: Storage: LVM
+endif::wiki[]
+
+Storage pool type: `lvm`
+
+LVM is a lightweight software layer that sits on top of hard disks and
+partitions. It can be used to divide available disk space into smaller logical
+volumes.
+
+Another use case is placing LVM on top of a large iSCSI LUN (Logical Unit
+Number) or a SAN (Storage Area Network) connected via Fibre Channel.
+This allows you to easily manage the space on the iSCSI LUN, which would
+otherwise be impossible because the iSCSI specification does not define a
+management interface for space allocation.
+
+
+[[pvesm_lvm_config]]
+Configuration
+~~~~~~~~~~~~~
+
+The LVM backend supports the common storage properties `content`, `nodes`,
+`disable`, and the following LVM specific properties:
+
+`vgname`::
+
+LVM volume group name. This must point to an existing volume group.
+
+`base`::
+
+Base volume. This volume is automatically activated before accessing
+the storage. This is mostly useful when the LVM volume group resides
+on a remote iSCSI server.
+
+`saferemove`::
+
+Called "Wipe Removed Volumes" in the web UI. Zero-out data when removing LVs.
+When removing a volume, this makes sure that all data gets erased and cannot be
+accessed by other LVs created later (which happen to be assigned the same
+physical extents). This is a costly operation, but may be required as a security
+measure in certain environments.
++
+Storage devices that support the "write zeroes" operation will use `blkdiscard`
+to zero blocks. Otherwise, a fallback to `cstream` is performed.
+
+`saferemove-stepsize`::
+
+Wipe step size in MiB (`blkdiscard -p` parameter value), capped to the maximum
+step size supported by the underlying storage. Up to 32 MiB (maximum) by
+default.
+
+`saferemove_throughput`::
+
+Wipe throughput (`cstream -t` parameter value), up to 10 MiB/s by default.
+
+`snapshot-as-volume-chain`::
+
+Set this flag to enable snapshot support for virtual machines on LVM with a
+volume backing chain.
+With this setting, taking a snapshot persists the current state under the
+snapshot's name and starts a new volume backed by the snapshot.
++
+A volume based on a snapshot references its parent snapshot volume as its
+backing volume and records only the differences to that backing volume.
+Snapshot volumes are currently thick-provisioned LVM logical volumes.
++
+This design avoids issues with native LVM snapshots, such as significant
+input/output (I/O) penalties and unexpected, dangerous behavior when running out
+of pre-allocated space.
++
+Snapshots as volume chains provide vendor-agnostic support for snapshots on any
+storage system that supports block storage. This includes iSCSI and Fibre
+Channel-attached SANs.
++
+Note that, although this feature relies on qcow2, it only uses qcow2's ability
+to layer multiple volumes in a backing chain, not qcow2's snapshot
+functionality.
+The snapshot functionality is managed by the PVE storage system.
++
+Enabling or disabling this flag only affects newly created virtual disk volumes.
++
+For efficient support of `snapshot-as-volume-chain`, the backing storage must
+support thin-provisioning and discard. Each snapshot will appear to use the
+full volume size on the PVE side, but the actual space usage on the underlying
+storage will be smaller if those requirements are met.
+
+WARNING: Snapshots as volume chains are currently a **technology preview** in {pve}.
+
+.Configuration Example (`/etc/pve/storage.cfg`)
+----
+lvm: myspace
+	vgname myspace
+	content rootdir,images
+----
+
+File naming conventions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The backend use basically the same naming conventions as the ZFS pool
+backend.
+
+ vm-<VMID>-<NAME>      // normal VM images
+
+Storage Features
+~~~~~~~~~~~~~~~~
+
+LVM is a typical block storage system.
+Unfortunately, regular LVM snapshots are inefficient because they interfere with
+all write operations within the entire volume group while the snapshot is
+active, which causes significant I/O degradation.
+This is why LVM does not support linked clones, and why {pve} added support for
+snapshots as volume chains. This feature manages the snapshot volume through the
+storage plugin and uses qcow2 to layer separate volumes as a backing chain. This
+creates a single disk state that is exposed to the guest.
+
+A benefit of LVM is that it can be used with shared storage.
+For example, an iSCSI LUN. The backend implements proper cluster-wide locking if
+the storage is marked as shared in the configuration.
+
+TIP: You can use the LVM-thin backend for non-shared local storage. It supports
+snapshots and linked clones.
+
+.Storage features for backend `lvm`
+[width="100%",cols="m,m,3*d",options="header"]
+|===============================================================================
+|Content types  |Image formats  |Shared   |Snapshots |Full Clones |Linked Clones
+|images rootdir |raw, qcow2     |possible |yes^1^    |yes         |no
+|===============================================================================
+
+^1^: Since {pve} 9, snapshots as a volume chain have been available for VMs, for
+details see the xref:pvesm_lvm_config[LVM configuration] section.
+
+Examples
+~~~~~~~~
+
+You can get a list of available LVM volume groups with:
+
+ # pvesm scan lvm
+
+ifdef::wiki[]
+
+See Also
+~~~~~~~~
+
+* link:/wiki/Storage[Storage]
+
+endif::wiki[]
+
+

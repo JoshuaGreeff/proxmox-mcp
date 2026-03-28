@@ -1,0 +1,61 @@
+[[getting_help]]
+Getting Help
+------------
+ifdef::wiki[]
+:pve-toplevel:
+endif::wiki[]
+
+
+Proxmox VE Wiki
+~~~~~~~~~~~~~~~
+
+The primary source of information is the {webwiki}. It combines the reference
+documentation with user contributed content.
+
+
+Community Support Forum
+~~~~~~~~~~~~~~~~~~~~~~~
+
+{pve} itself is fully open source, so we always encourage our users to discuss
+and share their knowledge using the {forum}. The forum is moderated by the
+Proxmox support team, and has a large user base from all around the world.
+Needless to say, such a large forum is a great place to get information.
+
+Mailing Lists
+~~~~~~~~~~~~~
+
+This is a fast way to communicate with the {pve} community via email.
+
+* Mailing list for users:
+  http://lists.proxmox.com/cgi-bin/mailman/listinfo/pve-user[{PVE} User List]
+
+{pve} is fully open source and contributions are welcome! The primary
+communication channel for developers is the:
+
+* Mailing list for developers:
+  http://lists.proxmox.com/cgi-bin/mailman/listinfo/pve-devel[{PVE} development
+  discussion]
+
+
+Commercial Support
+~~~~~~~~~~~~~~~~~~
+
+{proxmoxGmbh} also offers enterprise support available as
+{pricing-url}[{pve} Subscription Service Plans].
+All users with a subscription get access to the {pve}
+<<sysadmin_enterprise_repo,Enterprise Repository>>, and--with a Basic, Standard
+or Premium subscription--also to the Proxmox Customer Portal. The customer
+portal provides help and support with guaranteed response times from the {pve}
+developers.
+
+For volume discounts, or more information in general, please contact
+mailto:sales@proxmox.com[sales@proxmox.com].
+
+
+Bug Tracker
+~~~~~~~~~~~
+
+Proxmox runs a public bug tracker at https://bugzilla.proxmox.com. If an issue
+appears, file your report there. An issue can be a bug as well as a request for
+a new feature or enhancement. The bug tracker helps to keep track of the issue
+and will send a notification once it has been solved.

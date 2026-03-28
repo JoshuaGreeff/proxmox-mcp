@@ -1,0 +1,2355 @@
+pve-docs (9.1.2) trixie; urgency=medium
+
+  * mediawiki: return an error page to the user instead of triggering an
+    exception for bad names.
+
+  * mediawiki: explicitly test if the docs file exists. This avoids misleading
+    entries in the apache error log.
+
+  * fix #7106: intro: replace broken link to noVNC site.
+
+  * readme: replace broken link to AsciiDoc site.
+
+  * faq: minor typo and grammar fixes.
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 12 Dec 2025 14:18:26 +0100
+
+pve-docs (9.1.1) trixie; urgency=medium
+
+  * pct: application containers: fix classification as technology preview.
+
+  * update static/schema information for API viewer and generated synopsis.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 19 Nov 2025 13:02:23 +0100
+
+pve-docs (9.1.0) trixie; urgency=medium
+
+  * container: mention about possibility to upload OCI images from the browser.
+
+  * faq: mention OCI support in container technology comparison.
+
+  * container: clarify what part is a tech preview in the OCI section.
+
+  * screenshots: update UI overview ones that had more significant changes.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 18 Nov 2025 19:57:15 +0100
+
+pve-docs (9.0.9) trixie; urgency=medium
+
+  * network: improve title wording and casing.
+
+  * storage replication: document replication-specific network setting.
+
+  * containers: update to cgroupv2 being the only supported mode for PE 9
+    onwards
+
+  * fix #6656: asciidoc: add anchor links for paragraphs with IDs.
+
+  * cluster: network redundancy: explicitly mention subnets.
+
+  * qm: ovmf: mention that an RNG device is required for PXE boot.
+
+  * lvm: add note about requirements of snapshot-as-volume-chains.
+
+  * package-repos: fix disabling deb822 repository instructions.
+
+  * qemu: document the situations in when a QGA fs-freeze is issued for VMs.
+
+  * fix #6897: document that systemd requires LXC nesting.
+
+  * pve ceph: update OSD memory considerations.
+
+  * pve ceph: add section about the ceph configuration architecture and
+    tooling.
+
+  * fix #6728: remove mention of oldstable to clarify support/EOL policy.
+
+  * add notes about effects of purge flag for resource and guest removal.
+
+  * kernel samepage merging: describe how to disable for a specific VM.
+
+  * container: add basic documentations for OCI images and OCI containers.
+
+  * various small typo fixes and language improvements.
+
+  * update static/schema information for API viewer and generated synopsis.
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 17 Nov 2025 22:52:16 +0100
+
+pve-docs (9.0.8) trixie; urgency=medium
+
+  * network: update name of pinning tool to pve-network-pinning-tool.
+
+  * ha affinity rules: update section for restrictions to current capabilities
+    of mixed usage of node and resource affinity rules, simple cases are
+    allowed now.
+
+  * ha: rules: document CRS behavior for split positive resource affinity.
+
+  * ha: mark ha groups as deprecated and note migration to node affinity
+    rules and replace in-text references to HA groups with HA rules.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 05 Aug 2025 16:04:45 +0200
+
+pve-docs (9.0.7) trixie; urgency=medium
+
+  * network: update documentation for network-interface-pinning.
+
+  * cluster, network: add section on corosync over bonds.
+
+  * update static/schema information.
+
+  * ha: affinity rules: simplify overly verbose rule conflicts and errors
+    section.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 05 Aug 2025 07:00:00 +0200
+
+pve-docs (9.0.6) trixie; urgency=medium
+
+  * ha: add documentation about ha resource affinity rules
+
+  * update static/schema information.
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 31 Jul 2025 11:48:55 +0200
+
+pve-docs (9.0.5) trixie; urgency=medium
+
+  * lvm storage: fix spelling of Fibre Channel
+
+  * sdn: fabrics: remove duplicate paragraph in OSPF section
+
+  * LVM storage: reword and update to current capabilities
+
+  * remove GlusterFS plugin documentation, see libpve-storage-perl changelog
+    for some more detail.
+
+  * notifications: adapt to latest notification system UI changes-
+
+  * qmeventd: do not make a top-level chapter.
+
+  * make introduction chapter a first-class chapter.
+
+  * css: prefer Open Sans, sans-serif for general text font.
+
+  * css: do not differentiate visited links.
+
+  * css: ensure index image doesn't overflows ovoer the screen.
+
+  * html: make table overflow the x-axis automatically to avoid that whole
+    documentation gets a horizontal scroll-bar just due to one or two wider
+    tables, rather make those tables scrollable.
+
+  * html/css: add toggle menu for TOC on narrow (mobile) screens to have more
+    useable space for reading the actual documentation.
+
+  * html: rework index to order chapters and avoid visual noise from to many
+    table and table columns.
+
+  * package repos, software updates: revise Ceph section.
+
+  * asciidoc-pve scan-exjts: add allow-missing option to make bootstrapping
+    easier.
+
+  * ha: add documentation about ha rules and ha node affinity rules.
+
+  * ha: crs: document effects of HA node affinity rule on the CRS scheduler.
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 31 Jul 2025 08:34:19 +0200
+
+pve-docs (9.0.4) trixie; urgency=medium
+
+  * lvm storage: improve wording for snapshot-as-volume-chain option
+
+  * local-zfs: document raidz extension for PVE 9/ZFS 2.3.3
+
+  * package-repos: update key file path and hashes
+
+  * fabrics: fix IPv6 section
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 18 Jul 2025 14:41:14 +0200
+
+pve-docs (9.0.3) trixie; urgency=medium
+
+  * docs: add screenshots for SDN Fabrics.
+
+  * storage, lvm: add basic documentation for new snapshot-as-volume-chain
+    option.
+
+  * virtual machines: document new default behavior for mtu setting.
+
+  * user management: privileges:
+    - document new VM guest agent privileges.
+    - remove reference to dropped VM.Monitor privilege.
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 17 Jul 2025 23:02:46 +0200
+
+pve-docs (9.0.2) trixie; urgency=medium
+
+  * fix #6388: disk health: sync list of scanned devices
+
+  * pveceph/package-repos: adapt further to new deb822 format
+
+  * ha-manager: remove hardware fencing from requirements
+
+  * qm: cpu types: list that Haswell supports x86-64-v3 ABI
+
+  * calendar-events: add a note about `systemd-analyze calendar`
+
+  * pvecm: extend cluster requirements
+
+  * pvecm: drop notes about old version incompatibilities
+
+  * pveceph: update cluster shutdown procedure
+
+  * sdn: mention fingerprint option to the NetBox IPAM plugin
+
+  * VM VNC clipboard: add hint that live-migration does not work
+
+  * fabrics: add initial documentation for sdn fabrics
+
+  * network: add documentation for proxmox-network-interface-pinning
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 17 Jul 2025 01:12:54 +0200
+
+pve-docs (9.0.1) trixie; urgency=medium
+
+  * firewall: nftables: document new firewall bridge behavior.
+
+  * installation: remove maxroot size requirement and mention default instead.
+
+  * installation: reword explanation for maxroot and swap a bit.
+
+  * asciidoc conf: update ceph base url for PVE 9 baseline Ceph 19.2 Squid.
+
+  * faq: mention PVE 9 and add preliminary EOL for PVE 8 (can still be subject
+    to change).
+
+  * apt repositories: initial update for PVE 9 / Debian Trixie based repos.
+
+  * wiki: apt repositories: drop full repository list for PVE 5 and older.
+
+  * pvecm: update reference to votequorum qedvic manual page.
+
+  * update static/schema information.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 16 Jul 2025 02:37:42 +0200
+
+pve-docs (9.0.0) trixie; urgency=medium
+
+  * re-build for Debian 13 "Trixie" based Proxmox releases.
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 02 Jun 2025 18:59:56 +0200
+
+pve-docs (8.4.0) bookworm; urgency=medium
+
+  * qemu: consistently use virtiofs term
+
+  * qm: virtiofs: the writeback cache flag has been dropped from the
+    implementation for safety reasons, so remove mentions of it from the docs.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 09 Apr 2025 08:00:00 +0200
+
+pve-docs (8.3.2) bookworm; urgency=medium
+
+  * ha: update and expand CRM section
+
+  * storage replication: clarify that a Storage with the same ID needs to be
+    configured on the target node.
+
+  * mention how to configure specific network to be used for replication
+    traffic.
+
+  * qemu: machine version: document support life cycle in PVE.
+
+  * fix #5699: pveproxy: add docs for real-IP support, where the client
+    request IP is parsed from a configured header, e.g. for better reverse
+    proxy support.
+
+  * sync docs for installation through ISO with current capabilities and
+    requirements.
+
+  * introduction: update and extend project history.
+
+  * ceph chapter:
+    + add anchors for use in troubleshooting section.
+    + troubleshooting: revise and add frequently needed information.
+    + osd: revise and expand the section "Destroy OSDs"
+    + maintenance: revise and expand section "Replace OSDs"
+
+  * cluster configuration: node removal: mention Ceph and its steps for safe
+    removal.
+
+  * qemu backup: add notes regarding backups of windows and VSS
+
+  * qemu: resource mapping: add description for `mdev` option
+
+  * qemu: resource mapping: document `live-migration-capable` setting
+
+  * pveum: document correct pmxcfs file system path for ldap/realm
+    credentials.
+
+  * fix #4411: OpenID Connect (OIDC): add docs for group mapping support.
+
+  * fix #4234: add docs for OIDC optional userinfo request.
+
+  * web UI: describe consent-banner datacenter configuration option.
+
+  * document ballooning-target node configuration option.
+
+  * virtual machines: expand and document PVE downstream machine revisions.
+
+  * user management: clarify that password changes for PAM realm only apply to
+    the connected node.
+
+  * storage: make description of storage CLI examples more consistent.
+
+  * storage: change to newer pvesm scan subcommands in examples
+
+  * storage: add remaining pvesm scan command examples
+
+  * qemu: add SEV-SNP infos and improve documentation.
+
+  * sdn: unify explanation for how to setup FRR.
+
+  * backup: warn that tar does not honor exclusion pattern with a trailing
+    slash.
+
+  * qemu: add section for new VirtioFS support.
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 07 Apr 2025 23:17:05 +0200
+
+pve-docs (8.3.1) bookworm; urgency=medium
+
+  * sdn : add chapter reference for VNet level firewall
+
+  * sdn: add note to port isolation to use firewall in clusters, since port
+    isolation is only local on the host. To get better port isolation, the
+    VNet firewall can be used.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 20 Nov 2024 21:19:42 +0100
+
+pve-docs (8.3.0) bookworm; urgency=medium
+
+  * update static/schema information
+
+  * qm: import: use consistent capitalization for web UI
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 20 Nov 2024 11:58:54 +0100
+
+pve-docs (8.2.5) bookworm; urgency=medium
+
+  * installation: document advanced btrfs options
+
+  * ceph: update some dead links
+
+  * docs: drop experimental warning for change detection modes
+
+  * configuration files: add general section
+
+  * cli appendix: reference section about casing style
+
+  * qm: add AMD SEV documentation
+
+  * update static/schema information
+
+  * ceph: fix two broken lists
+
+  * n: add documentation for firewall integration
+
+  * firewall: add documentation for forward direction and vnet zone
+
+  * qm: adapt import section to newly added OVA/OVF import
+
+  * sdn: add documentation for isolated ports option
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 19 Nov 2024 18:54:12 +0100
+
+pve-docs (8.2.4) bookworm; urgency=medium
+
+  * zfs: correct language errors
+
+  * sdn: correct language errors
+
+  * notifications:
+    - describe new notification metadata fields
+    - match-field exact-mode can now match multiple values
+    - add note regarding when job-id is set for backups
+    - add documentation for webhook target endpoints.
+
+  * images: update grub menu screenshot to 8.2-2 ISO
+
+  * system requirements: use correct and modern acronym for Intel 64-bit
+
+  * btrfs: Add link to upstream docs regarding its status
+
+  * pci-passthrough: drop obsolete `vfio_virqfd` kernel module
+    requirement
+
+  * pci-passthrough: add note about mediated devices w.r.t kernel
+    modules
+
+  * pci-passthrough: reword iommu since it is now always enabled by
+    default
+
+  * fix #5665: add note about short-lived cert renewal
+
+  * package repos: document Ceph 19.2 Squid repos
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 11 Nov 2024 22:31:48 +0100
+
+pve-docs (8.2.3) bookworm; urgency=medium
+
+  * fix #5429: network: include Type=ether in the example for how to override
+    the name for network devices and suggest updating the initramfs afterwards
+
+  * totp: fix copy/paste mistake referring to PBS by accident
+
+  * fix #5512: installation: fix typo
+
+  * TLS certificates: clarify where the `alias` property needs to be set
+
+  * html output: add clickable anchor link to all headings
+
+  * acme: add note about validation delay
+
+  * ceph server: document full cluster shutdown
+
+  * backup: mention where fleecing can be configured
+
+  * notification: clarify that 'hostname' does not include the domain
+
+  * notifications: backport some rephrased parts from PBS docs
+
+  * qm: fix documented formula for ballooning
+
+  * backup: add section describing PBS change detection mode
+
+  * vm resource limits: fix typo
+
+  * fix #5525: storage: pbs: improve master-pubkey docs
+
+  * cloudinit: add Windows cloudbase-init section
+
+  * vIOMMU: replace host requirement with reference to pcie passthrough
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 31 Jul 2024 16:58:41 +0200
+
+pve-docs (8.2.2) bookworm; urgency=medium
+
+  * vzdump: do not mark fleecing as tech-preview anymore, that's outdated now
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 25 Apr 2024 09:24:16 +0200
+
+pve-docs (8.2.1) bookworm; urgency=medium
+
+  * update static/schema information
+
+  * backup: add various screenshots from the backup job add and edit window
+
+  * firewall: add documentation for the new nftables-based opt-in
+    proxmox-firewall implementation
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 23 Apr 2024 22:09:06 +0200
+
+pve-docs (8.2.0) bookworm; urgency=medium
+
+  * installation: fix volume group name
+
+  * pvenode/wake-on-lan: mention defaults and optional config options
+
+  * system-requirements: mention that SSDs with PLP should be used
+
+  * add vIOMMU documentation
+
+  * backup: update information about performance settings
+
+  * backup: clarify where repeat-missed option can be found now
+
+  * storage: pbs: document port option
+
+  * secure boot: mention proxmox-secure-boot-support metapackage
+
+  * qm: add overrule-shutdown to CLI usage examples
+
+  * ssh: document PVE-specific setup
+
+  * vzdump: add section about backup fleecing
+
+  * firmware: adapt to proxmox packaged fwupd
+
+  * network: update specification for the reduced restrictions on bridge names
+
+  * update static/schema information
+
+  * installation: add section about unattended/automatic installation
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 22 Apr 2024 13:42:22 +0200
+
+pve-docs (8.1.5) bookworm; urgency=medium
+
+  * zfs: add a note about dRaid performance
+
+  * qm: multiqueue specify that it needs to be vCPUs not cores
+
+  *  qm: add documentation on configuring multiqueue for windows guests
+
+  * package-repos: improve wording partly based on pmg-docs
+
+  * installation: include various improvements made for PMG
+
+  * installation: update link to installing on top of Debian to bookworm version
+
+  * qm: rework import section, document new import wizard
+
+  * update static/schema information
+
+  * local-zfs: mention `zfs_arc_max` clamping by the installer
+
+  * installation: document `ARC max size` option for ZFS-on-root installations
+
+  * installation: reword `nomodeset` section a bit, add link to it
+
+  * installation: reference GRUB boot entry for serial console mode
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 27 Mar 2024 14:46:50 +0100
+
+pve-docs (8.1.4) bookworm; urgency=medium
+
+  * secure boot: fix typos, add inline code formatting
+
+  * fix #5087: qm: formatting of start/shutdown order list
+
+  * fix #5089: pvesdn: replace quest(s) -> guest(s)
+
+  * local-zfs: reference correct man page for vdev infos
+
+  * notifications: fix typos and improve reading flow
+
+  * storage: lvm: expand on description of the 'saferemove' option
+
+  * storage: improve description of 'shared' property
+
+  * installation: update installer option wording & description
+
+  * ballooning: precise example
+
+  * pvecm: correct network address
+
+  * qm: revise and reword resource limits sections
+
+  * screenshots: update grub menu screenshot
+
+  * installation: add note about memtest86+ incompatibility with secureboot
+
+  * installation: add section about booting with `nomodeset` kernel parameter
+
+  * tree-wide: unify spelling of GRUB and systemd-boot
+
+  * fix #5140: qdevice SSH access documentation
+
+  * partially fix #5139: document qnetd port requirement
+
+  * vzdump: remove usage examples involving 'notification-{target, policy}'
+
+  * css: fine-tune h4, h5, h6 headings font-sizes
+
+  * correctly render title of 4th section levels inside manpages
+
+  * storage: fix ZFS-over-iSCSI links for wiki
+
+  * local-btrfs: unify casing for btrfs
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 06 Mar 2024 18:21:39 +0100
+
+pve-docs (8.1.3) bookworm; urgency=medium
+
+  * system booting: add note about weird uefi behaviour
+
+  * secure boot: add subsection for DKMS/MOK
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 23 Nov 2023 10:50:39 +0100
+
+pve-docs (8.1.2) bookworm; urgency=medium
+
+  * sdn: Fix heading for NetBox IPAM plugin section
+
+  * system-booting: add instructions to switch install to secure boot
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 22 Nov 2023 19:03:34 +0100
+
+pve-docs (8.1.1) bookworm; urgency=medium
+
+  * consistently use web UI and web interface wording
+
+  * notifications: add screenshots for the new notification UI
+
+  * various typo and grammar fixes
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 22 Nov 2023 15:03:10 +0100
+
+pve-docs (8.1.0) bookworm; urgency=medium
+
+  * vzdump: mention file-restore log file
+
+  * ha: document where shutdown policy is set
+
+  * package repos: add Ceph 18.2 Reef repos
+
+  * calendar events: fix build for wiki target
+
+  * vzdump: mention new parameter 'pbs-entries-max'
+
+  * sysadmin: add section 'Firmware Updates' and references
+
+  * ct: update broken link to CentOS release EOL
+
+  * fix #2920: add cifs options parameter
+
+  * qemu: update the PCI(e) docs
+
+  * boot: kernel cmdline: clarify where kernel version/docs can be found
+
+  * faq: use only major release version in EOL table
+
+  * installation: document UP indicator in network setup
+
+  * sdn: add notes about BGP and IS-IS controller
+
+  * zfs: improve and expand on ZIL and cache sections
+
+  * zfs: add extra hint for raidz consideration section
+
+  * ha: Explicitly mention that migrations only affect HA guests
+
+  * sysadmin: revise firmware chapter, add firmware repo section
+
+  * ui: correct outdated info about entries in the top header
+
+  * qm: add section about machine types
+
+  * ceph: rework introduction and recommendation section
+
+  * ceph: add more details for private/public network usage and distinction
+
+  * fix #4847: network: extend section on interface naming scheme
+
+  * various wording consistency fixes
+
+  * notifications: update docs to for matcher-based notifications
+
+  * notifications: document SMTP endpoints
+
+  * notifications: add documentation for system mail forwarding
+
+  * notifications: change to simplified ACL structure.
+
+  * sdn: overall language and consistency rework
+
+  * sdn: add section about underlying technology and configuration files
+
+  * add VNC clipboard documentation
+
+  * notification: document 'unknown' severity
+
+  * sdn: rework introduction and installation and add support status
+
+  * sdn: dhcp: Add documentation for DHCP
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 21 Nov 2023 20:49:09 +0100
+
+pve-docs (8.0.5) bookworm; urgency=medium
+
+  * pvecm: add node: let parameter use two dashes
+
+  * pvesm: update documentation of the list feature
+
+  * installation: note that TUI uses same code and use thumbnail attribute
+
+  * installation: add screenshot of tui installer
+
+  * installation: update installer boot menu options and screenshot
+
+  * gitattributes: treat .ppm as binary
+
+  * add documentation for the new notification system
+
+  * update static/schema information
+
+  * pvecm: add qdevice status flag explanation
+
+  * pvecm: fix pvecm status indentation
+
+  * user management: add note about case-sensitivity for AD realm
+
+  * fix #4866: fix install on Debian wiki link
+
+  * fix proxmox-kernel-helper package name
+
+  * pveum: sort roles and privileges alphabetically
+
+  * pveum: add missing roles and privileges
+
+  * pmxcfs: fix incorrect exmple command
+
+  * cgroup: update note about legacy cgroup controller support
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 16 Aug 2023 12:03:55 +0200
+
+pve-docs (8.0.4) bookworm; urgency=medium
+
+  * faq: fix typo in release names
+
+  * package repos: fix ceph enterprise package repository URL
+
+  * docinfo: use https in link
+
+  * d/control: ensure docs are build with compatible asciidoc that uses our
+    docbook config with the thumbnail attributes. This fixes the missing
+    screenshots in the PDF and EPUB builds.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 25 Jun 2023 14:50:35 +0200
+
+pve-docs (8.0.3) bookworm; urgency=medium
+
+  * qemu: add cpu models documentation
+
+  * storage: add hint to avoid storage aliasing
+
+  * qm: move out known vCPU list to actual appendix
+
+  * resource mapping: add screenshots
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 21 Jun 2023 18:12:17 +0200
+
+pve-docs (8.0.2) bookworm; urgency=medium
+
+  * user & access management: update and extend permission documentation
+
+  * virtual machines: add documentation about cluster-wide device mappings
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 19 Jun 2023 09:11:37 +0200
+
+pve-docs (8.0.1) bookworm; urgency=medium
+
+  * network: rephrase corosync and bonds recommendations
+
+  * backup: Fix wrong unit for bandwidth limit
+
+  * storage clients: mark ZFS level as both
+
+  * package repos: update for upcoming PVE 8 and Ceph enterprise repo
+
+  * faq: update future Proxmox VE 7 EOL date and track 8
+
+  * faq: split upgrade Q into minor and major upgrades
+
+  * faq: add link for 7 to 8 upgrade
+
+  * user management: document TFA lockout
+
+  * cephfs: mention fs-name parameter
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 09 Jun 2023 11:20:48 +0200
+
+pve-docs (8.0.0) bookworm; urgency=medium
+
+  * bump version for Proxmox VE 8 / Debian 12 Bookworm
+
+  * change to native version
+
+  * user management: specify space and number sign escaping for LDAP DNs
+
+  * fix #4641: qm: fix typo
+
+  * pmxcfs: record that file size limit is now 128 MiB (since a while)
+
+  * update static/schema information
+
+  * general wording improvements and typo fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 18 May 2023 15:47:08 +0200
+
+pve-docs (7.4-2) bullseye; urgency=medium
+
+  * config: remove reference to preceding / from content-dirs
+
+  * sdn: document the `rp_filter` sysctl knob, useful for when multiple evpn
+    nodes are used
+
+  * qm: add section explaining the new option for controlling the QGA fs-freeze
+    and fs-thaw during backup
+
+  * fix #2641: document subdir parameter for CIFS backend
+
+  * ui overview: remove references to storage view, got dropped recently due
+    to not being useful on its own
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 22 Mar 2023 14:52:09 +0100
+
+pve-docs (7.4-1) bullseye; urgency=medium
+
+  * qm: IO thread: be more precise about how QEMU handles IO and mention that
+    setting can also help with hangs/stalls
+
+  * docs: document 'content-dirs' parameter for directory storage
+
+  * cluster join: mention that storage config from cluster is inherited
+
+  * access control: remove misleading 'additionally' in perm-modify
+    description
+
+  * pveum: remove `auth` part from Keycloak issuer URL to adapt to newer
+    versions
+
+  * fix #4194: clarify that its a bulk shutdown, not immediate hard stop
+
+  * qm: hard disk controllers: recommend VirtIO controllers and mention that
+    virtio devices are better maintained
+
+  * docs: add dark-mode support to the documentation and the api viewer. The
+    theme is chosen automatically depending on the browser/OS's
+    preferred-color-scheme media query
+
+  * qm: guest trim: add note mentioning issue when the ext4 file system is
+    used
+
+  * user management: document reserved characters and quoting of LDAP DNs
+
+  * user management: add RFC reference for reserved characters
+
+  * tree-wide: switch to offical spelling of QEMU
+
+  * fix #4422: correct hdiutil parameter order
+
+  * introduction: add some references
+
+  * installation: update wiki link for debian bullseye guide
+
+  * ha: document manual maintenance mode
+
+  * ha crs: improve introduction and add screenshot of option
+
+  * ha crs: document scheduling points and new ha-rebalance-on-start option
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 20 Mar 2023 20:04:17 +0100
+
+pve-docs (7.3-1) bullseye; urgency=medium
+
+  * sysadmin zfs: document pool naming rules
+
+  * sysadmin network: document disabling mac-learning on a bridge
+
+  * ha: crs: remove outdated comment about the need to restart the manager
+    services to apply any change to the scheduler mode
+
+  * update static/schema information
+
+  * various grammar and typo fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 21 Nov 2022 12:23:41 +0100
+
+pve-docs (7.2-5) bullseye; urgency=medium
+
+  * fix #4319: use corred port range for corosync v3.x
+
+  * pcie-passthrough: note that iommu activation is not always necessary
+
+  * pcie-passthrough: add short note about iommu passthrough mode
+
+  * local-zfs Remove SSD model suggestion as it's outdated
+
+  * local-zfs: rephrase ZFS RAID description
+
+  * qm: add documentation for vm network MTU setting
+
+  * ha: add basic section about cluster resource scheduling
+
+  * gui: document tags with screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 18 Nov 2022 17:00:26 +0100
+
+pve-docs (7.2-4) bullseye; urgency=medium
+
+  * cloud init: use 'order' variant for 'boot' property, use expected disk
+    number in example and use 'import-from' disk syntax to avoid a step
+
+  * document the existence of the VM.Config.Cloudinit privilege
+
+  * fix #3967: add ZFS dRAID documentation
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 18 Nov 2022 08:39:14 +0100
+
+pve-docs (7.2-3) bullseye; urgency=medium
+
+  * close #4031: vm: import: simplify example for creating VM from existing
+    disk
+
+  * sysadmin: update links for wiki target
+
+  * limit zfs arc: add '-k all' to 'update-initramfs' command
+
+  * ceph ec: fix typos and reword some sections
+
+  * ceph: add quincy repo reference
+
+  * add clarification of experimental zfs encryption status
+
+  * update static/schema information
+
+  * network: add warning to ifup and ifdown sequence, as it won't reattach
+    guests network device to the underlying bridge
+
+  * network: rework introduction for people with less experience
+
+  * cloud init: add warning to not install cloud-init on the host
+
+  * backup: rework storage section, mentioning and recommending PBS
+
+  * backup: expand section for jobs
+
+  * backup: mention new `max-workers` performance setting
+
+  * fix #4307: installation: correct typos in prepare macOS medium section
+
+  * pvesr: remove outdated note about offline migration
+
+  * qm: rework migration sections, drop mentioning outdated limitations
+
+  * asciidoc: fix capitalization of GmbH
+
+  * installation: add note that secure boot currently needs to be disabled
+
+  * fix #3593: document the new `affinity` VM setting for configuring the CPU
+    task set
+
+  * asciidoc-pve: disallow certain characters in onlineHelp keys
+
+  * various grammar and typo fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 14 Nov 2022 20:29:50 +0100
+
+pve-docs (7.2-2) bullseye; urgency=medium
+
+  * pveceph: erasure coded pool: add note about parameter usage affecting
+    mostly just the metadata-pool on creation
+
+  * update static/schema info
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 04 May 2022 07:30:00 +0200
+
+pve-docs (7.2-1) bullseye; urgency=medium
+
+  * calendar-events: update format and add more examples
+
+  * pbs storage: fix typo in feature table
+
+  * pveum: add paragraph about syncing user attributes
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 02 May 2022 17:38:02 +0200
+
+pve-docs (7.1-3) bullseye; urgency=medium
+
+  * VM live migration: mention that CPU vendor should be the same
+
+  * add section for protection of backups
+
+  * pveproxy: document newly added TLS disable-version and TLS key-file
+    options
+
+  * storage: rbd: cephfs: update authentication section
+
+  * pci-passthrough: add section about new vendor and model ID overrides
+
+  * storage: document preallocation as a common storage option
+
+  * cluster: network: clarify and ease latency requirements
+
+  * add documentation for the new icmp-type parameter
+
+  * sdn: update bgp/evpn documentation
+
+  * zfs: update documentation about ZED, reflecting that it's installed by
+    default since Proxmox VE 6.1
+
+  * storage: switch to 'prune-backups' in examples
+
+  * vzdump/storage: mention protected backups limit and give an example
+
+  * fix #3884: Add section for kernel samepage merging
+
+  * sys: boot: initial basic documentation for new kernel version pinning
+
+  * storage: rbd: document optional ceph client configuration for external
+    clusters
+
+  * pve-network: Fix routed configuration example
+
+  * ldap/ad realms: update documentation about sync-options
+
+  * vzdump: add section for notes and notes-template
+
+  * qm: add very basic VirGL docs
+
+  * pveceph: add section about erasure code pools
+
+  * pvecm: add basic next-id section
+
+  * update static/schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 29 Apr 2022 17:35:18 +0200
+
+pve-docs (7.1-2) bullseye; urgency=medium
+
+  * update TFA docs
+
+  * update static/schema information
+
+  * qm and pct: mention move-disk for storage and reassign
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 15 Nov 2021 16:07:34 +0100
+
+pve-docs (7.1-1) bullseye; urgency=medium
+
+  * network: the netmask property is depreacated, avoid referring to it and
+    use CIDR format for addresses
+
+  * pvesr: remove note about non working live migration, it works nowadays
+
+  * fix #3523: routed net: make example conform to image
+
+  * fix #3557: qm/pci-passthrouh: add note about the 'All Functions' checkbox
+
+  * storage: add minimal zfs over iscsi doc
+
+  * fix #3598: include chrony in time synchronisation section
+
+  * fix #844: document first VM/CT start-up delay
+
+  * pvenode: add task & migrate/stop/startall sections
+
+  * network: add bridge-vids to vlan aware bridge example
+
+  * pvesdn: document evpn "Advertise Subnets" and "Exit Nodes Local" routing
+    options
+
+  * sdn: add vxlan encryption notes
+
+  * pvecm: fix command output formatting
+
+  * pvecm: update instructions to add redundant links
+
+  * pvecm: add note about corosync killnode error
+
+  * fix #3375: warn user to remove replication jobs
+
+  * pct: clarify simple restore mode default 'local' storage
+
+  * pveum: add intro to 'limited API Token' section
+
+  * pveum: expamd LDAP/AD explanation and restructure section
+
+  * qm: add note about secure boot and new efidisk behaviour
+
+  * qm: add section about TPM
+
+  * old repos: use `/pve` suffix in URLs, it has better compatibility
+
+  * remove 'amd_iommu=on' from the passthrough docs
+
+  * pci-passthrough: expand IOMMU section with notice about BIOS
+
+  * pct: add section for supported distributions
+
+  * refactor calendar events into appendix
+
+  * vzdump: minimal changes to document vzdump.cron to pvescheduler switch
+
+  * pvescheduler: add basic docs and manual page
+
+  * pveceph: improve documentation for destroying a CephFS
+
+  * various formatitting, typo and language improvements
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 11 Nov 2021 18:46:38 +0100
+
+pve-docs (7.0-5) bullseye; urgency=medium
+
+  * container: add Control Group (cgroup) section
+
+  * user-management: add OpenID Connect documentation
+
+  * ha: document recovery state
+
+  * container: cgroup: describe some possibilities to resolve version change
+    for old CTs
+
+  * add basic markdown primer for gui notes onlineHelp
+
+  * package repositories: mention new apt repo-status GUI
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 05 Jul 2021 16:54:24 +0200
+
+pve-docs (7.0-3) bullseye; urgency=medium
+
+  * Proxmox Backup Server: add information about master key support
+
+  * pveum: clarify that disabling or deleting users won't automatically stop
+    their currently running tasks
+
+  * add a basic BTRFS section for the new, as technology preview added storage
+    plugin
+
+  * update static API and schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 23 Jun 2021 22:57:08 +0200
+
+pve-docs (7.0-2) bullseye; urgency=medium
+
+  * mediawiki: transform into new-style add-on#
+
+  * fix #3202: pveum: add Pool.Audit permission
+
+  * faq: add entry for PVE 7 and set tentative EOL date for PVE 6
+
+  * update repositories for PVE 7 based on Debian 11/Bullseye
+
+  * update static API and schema information
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 18 Jun 2021 19:38:18 +0200
+
+pve-docs (7.0-1) bullseye; urgency=medium
+
+  * bump version for Proxmox VE 7 / Debian Bullseye
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 13 May 2021 19:20:01 +0200
+
+pve-docs (6.4-2) pve; urgency=medium
+
+  * pveum: u2f: note that self-signed certificates not added to the system
+    trust store may nowadays work with U2F just fine
+
+  * network: shortly document how one can disable IPv6 support gracefully
+
+  * pveproxy: add notes about binding to IPv6 only
+
+  * pveproxy: improve LISTEN_IP documentation and add more examples
+
+  * general typo/grammar fixes and external link hygiene
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 07 May 2021 18:37:37 +0200
+
+pve-docs (6.4-1) pve; urgency=medium
+
+  * pbs storage: consistently talk about the storage key
+
+  * VM/CT: Add explanation for the "purge" option on guest removal
+
+  * VM: add QEMU Guest Agent section
+
+  * fix #3264: RBD storage: improve documentation for the user-id in rbd
+    storage configuration
+
+  * external metrics server: explain the HTTP(s) API
+
+  * update SDN (tech preview) documentation
+
+  * fix #3327: qm: update link to looking glass project
+
+  * ceph: add explanation on the PG-autoscaler
+
+  * local ZFS: improve memory-limit section
+
+  * local ZFS: add section on zpool-features
+
+  * pveproxy: document the new LISTEN_IP setting
+
+  * vzdump: add section about live-restore
+
+  * vzdump: add section about single-file restore
+
+  * pveum: adapt CLI examples to newer sub-command syntax
+
+  * update static API and schema information
+
+  * sys: boot/zfs: adapt docs to proxmox-boot-tool update
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 26 Apr 2021 19:17:25 +0200
+
+pve-docs (6.3-1) pve; urgency=medium
+
+  * virtual machines: add section about VM device boot order
+
+  * storage: Proxmox Backup Server: add section about encryption
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 25 Nov 2020 15:57:14 +0100
+
+pve-docs (6.2-7) pve; urgency=medium
+
+  * system requirements: minor language fixup
+
+  * update links to the ceph docs
+
+  * authentication realm: add information about realm certificates
+
+  * sysadmin: fix the device declaration in the bonding example
+
+  * Proxmox Backup Server: fix password and encryption key file location
+
+  * package repos: document Ceph Octopus repositories
+
+  * external metric server: update and add screenshots
+
+  * add documentation for the prune-backups option
+
+  * pvecm: explain role of ssh in PVE stack
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 24 Nov 2020 16:49:32 +0100
+
+pve-docs (6.2-6) pve; urgency=medium
+
+  * Add section with more information about ZFS RAID levels
+
+  * ha-manager: fix typos and grammatical errors; improve wording
+
+  * fix #2526: network configuration: change underscore to dash
+
+  * network: nat: add extra newlines between links for readability
+
+  * translation: combine old wiki entry with respective documentation section
+
+  * various typography and grammar fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 18 Sep 2020 16:54:38 +0200
+
+pve-docs (6.2-5) pve; urgency=medium
+
+  * update link for YubiKey documentation
+
+  * sdn: various improvements and addition
+
+  * pvesm: Add an example and clarification for the export command
+
+  * fix #2704: zfs-local: add disk replacement steps for grub
+
+  * sysboot: add a section on how to determine the used bootloader
+
+  * storage: add initial Proxmox Backup Server docs
+
+  * VMs: add man-page and notes about custom CPU models
+
+  * update static data and schema definitions
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 13 Jul 2020 12:09:21 +0200
+
+pve-docs (6.2-4) pve; urgency=medium
+
+  * add documentation for new experimental SDN (Software Defined Network)
+    integration.
+
+ -- Proxmox Support Team <support@proxmox.com>  Sun, 10 May 2020 20:13:17 +0200
+
+pve-docs (6.2-3) pve; urgency=medium
+
+  * add screenshots for LDAP/AD sync edit window
+
+  * small typo fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 08 May 2020 18:39:55 +0200
+
+pve-docs (6.2-2) pve; urgency=medium
+
+  * re-order certificate management, add content and screenshots
+
+  * vzdump: add section about backup compression algorithms
+
+  * remove SLAAC reference from cloudinit docs
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 07 May 2020 21:41:17 +0200
+
+pve-docs (6.2-1) pve; urgency=medium
+
+  * pveceph: Reducing number of PGs is possible
+
+  * Add documentation for virtio-rng
+
+  * improve storage replication chapter
+
+  * Also mentioning FC-based storage
+
+  * certs: extend ACME section with DNS/plugin info and CLI example
+
+  * add documenation for ldap syncing
+
+  * html TOC: add "back to index" link
+
+  * update static data and schema definitions
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 06 May 2020 20:23:22 +0200
+
+pve-docs (6.1-6) pve; urgency=medium
+
+  * installation: update wiki link to Buster
+
+  * rework Proxmox container toolkit chapter
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 19 Feb 2020 15:53:05 +0100
+
+pve-docs (6.1-5) pve; urgency=medium
+
+  * html: avoid horizontal overflows, break-word and limit inline image width
+    to text-width
+
+  * pvecm: fix corosync link priority description
+
+  * general grammar and typography fixes and improvements
+
+  * rename "usbstick" to "installation media" and move before installation
+    wizard section
+
+  * document API tokens
+
+  * firewall: update and expand used ports
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 13 Feb 2020 12:07:39 +0100
+
+pve-docs (6.1-4) pve; urgency=medium
+
+  * apiviewer: format return values as grid with optionial toggle raw
+
+  * apiviewer: add search box and collapse/expand tools for endpoint navigation
+    tree
+
+  * add chapter about hibernation and vmstate storage selection
+
+  * add section 'Compression in ZFS'
+
+  * move over to new table of contents (TOC) mode for HTML output. Keep it always
+    visible as sidebar on the left side. This allows to easier navigate the
+    documentation without the need of constantly navigating back to top to view
+    the TOC.
+
+  * move ceph docs to own top level heading in TOC for better visibillity of
+    it's second level headings (CephFS, Pools, ...)
+
+  * hci: add Storage section refering to ceph/ZFS
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 28 Jan 2020 18:47:38 +0100
+
+pve-docs (6.1-3) pve; urgency=medium
+
+  * add documentation about applying pending host network changes
+
+  * replication: improve explanation of interaction between replication and HA
+    manager
+
+  * ha: add some information about edge-cases to migrate shutdownpolicy section
+
+  * fiy some typos
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 02 Dec 2019 11:02:29 +0100
+
+pve-docs (6.1-1) pve; urgency=medium
+
+  * Add description for mountpoint property
+
+  * ha: add shutdown policy docs
+
+  * update static schema/synopsis definitions
+
+  * fix typos, grammar
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 27 Nov 2019 18:47:50 +0100
+
+pve-docs (6.0-9) pve; urgency=medium
+
+  * Fix #2459: qm: Make info about core limit clear
+
+  * Fix #1958: pveceph: add section Ceph maintenance
+
+  * reorganize and improve ceph chapter
+
+  * some typo and grammar fixes
+
+  * update static schema/synopsis definitions
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 18 Nov 2019 12:51:43 +0100
+
+pve-docs (6.0-8) pve; urgency=medium
+
+  * adapt to VZDump helper code refactoring
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 18 Oct 2019 09:17:10 +0200
+
+pve-docs (6.0-7) pve; urgency=medium
+
+  * repos: change security repo link for future proofing and add note
+    for bullseye
+
+  * display: add URL and short explanation of SPICE
+
+  * fix pve-doc-generator instant docs view check
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 08 Oct 2019 15:15:01 +0200
+
+pve-docs (6.0-5) pve; urgency=medium
+
+  * update various screenshots
+
+  * Add audio device documentation
+
+  * Update documentation for TRIM/Discard on virtio-blk
+
+  * efi boot: add note about update-initramfs hooks
+
+  * fix typos all over the place
+
+  * Mention GUI for creating a cluster and adding nodes, with screenshots
+
+  * imrpove documentation for experimental SDN plugins
+
+  * add spice enhancements documentation
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 07 Oct 2019 16:10:47 +0200
+
+pve-docs (6.0-4) pve; urgency=medium
+
+  * add some documentation for ZFS encryption
+
+  * system boot: refer to new pve-efiboot-tool commands
+
+  * add and update some screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 15 Jul 2019 21:45:00 +0200
+
+pve-docs (6.0-3) pve; urgency=medium
+
+  * Update pvecm documentation for corosync 3
+
+  * Add documentation on supported bootloaders (systemd-boot, GRUB)
+
+  * boot/zfs: add docs for pve-efiboot-tool
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 11 Jul 2019 19:14:26 +0200
+
+pve-docs (6.0-2) pve; urgency=medium
+
+  * fix #2092: re-add HA Simulator documentation
+
+  * document #2247: add info about SSH fingerprints on cluster leave
+
+  * update static synopsis and schema resources
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 04 Jul 2019 16:19:33 +0200
+
+pve-docs (6.0-1) pve; urgency=medium
+
+  * general typo and grammar fixes
+
+  * update static synopsis and schema definitions
+
+  * add cloudinit dump and snippets documentation
+
+  * add some notes regarding IP vs hostname as corosync address
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 25 Jun 2019 12:51:20 +0200
+
+pve-docs (6.0-0+1) pve; urgency=medium
+
+  * bump version for Debian buster
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 21 May 2019 14:34:18 +0200
+
+pve-docs (5.4-2) unstable; urgency=medium
+
+  * Update TFA documentation
+
+  * qemu: document new System panel and its settings
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 08 Apr 2019 08:02:09 +0200
+
+pve-docs (5.4-1) unstable; urgency=medium
+
+  * Update recommended system requirements and supported browser
+
+  * add ivshmem documentation
+
+  * fix #2112: remove typo in pvecm chapter
+
+  * update & rearrange installation chapter
+
+  * add initial documentation for qdevice
+
+  * fix: #2123 Logging of user defined firewall rules
+
+  * depreacate and remove all notes about sheepdog storage
+
+  * document logging of default and user defined firewall rules
+
+  * Reword krbd option description
+
+  * improve and add to ceph documentation
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 04 Apr 2019 17:17:37 +0200
+
+pve-docs (5.3-3) unstable; urgency=medium
+
+  * add zsh completion targets
+
+  * improve gramar and typography
+
+  * Fix #2018: CephFS client needs newer binaries
+
+  * Fix #2015: add how to get a auth secret for cephfs
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 20 Feb 2019 12:20:05 +0100
+
+pve-docs (5.3-2) unstable; urgency=medium
+
+  * improve pveceph and cephfs chapters
+
+  * update static generated files
+
+  * add guest hook documentation and example script
+
+  * add wakeonlan documentation
+
+  * grammar and typography fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 01 Feb 2019 13:46:41 +0100
+
+pve-docs (5.3-1) unstable; urgency=medium
+
+  * fix #1138: installation: note how one can progress with keyboard only
+
+  * fix #1292: qm: NUMA: a socket can have more nodes
+
+  * fix clean-static find call
+
+  * Expand documentation for swap with ZFS.
+
+  * pveceph: add initial CephFS documentation
+
+  * update static auto generated files (API definitions, synopsis, ...)
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 29 Nov 2018 13:15:54 +0100
+
+pve-docs (5.2-10) unstable; urgency=medium
+
+  * fix #1850: document API vs SSH cluster joining
+
+  * fix #1975: extend 'My Settings' documentation
+
+  * fix #1959: remove 'auto' (SLAAC) from cloud-init ip config documentation
+
+  * document new ssd option
+
+  * add display type documentation
+
+  * add pci passthrough and sr-iov documentation
+
+  * add documentation for mediated devices (vGPU/GVT-g)
+
+  * add manpage for qmeventd
+
+  * typo fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 14 Nov 2018 15:27:33 +0100
+
+pve-docs (5.2-9) unstable; urgency=medium
+
+  * add documentation for vxlan layer 2 network and layer 3 routing
+
+  * add graphviz picture for our default routed network setup
+
+  * add framework to generate network graphs using graphviz
+
+  * build system: fix broken parallel builds
+
+  * api-viewer: correctly escape html when displaying return types.
+
+  * qm: add vmgenid documentation
+
+  * improve spectre/meltdown cpu flags documentation
+
+  * pve-doc-generator: add rules for API verification and bash-completion
+
+  * update static auto generated files (API definitions, synopsis, ...)
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 23 Oct 2018 12:58:58 +0200
+
+pve-docs (5.2-8) unstable; urgency=medium
+
+  * add lvm/zfs anchors
+
+  * certificate-managment.adoc: describe dir change
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 08 Aug 2018 08:51:56 +0200
+
+pve-docs (5.2-7) unstable; urgency=medium
+
+  * gen-output-format-opts.pl: use correct argument syntax
+
+  * output-format.adoc: fix typo
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 27 Jul 2018 11:56:38 +0200
+
+pve-docs (5.2-6) unstable; urgency=medium
+
+  * pve-admin-guide: include pvenode and pvesh docs
+
+  * output-format.adoc: documentation for output format options
+
+  * add pvesh.adoc
+
+  * api-viewer: use our extjs package
+
+  * api-viewer: use 'normal' over 'touch' theme
+
+  * api-viewer: use much smaller minified extjs
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 27 Jul 2018 10:49:40 +0200
+
+pve-docs (5.2-5) unstable; urgency=medium
+
+  * add CephFS documentation
+
+  * update static generated files
+
+  * add references to all storage documentations
+
+  * update pveceph documentation
+
+  * fix #1818: use NTP instead of Servers in timesyncd.conf
+
+  * Add a point regarding major upgrades to FAQ
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 10 Jul 2018 12:05:33 +0200
+
+pve-docs (5.2-4) unstable; urgency=medium
+
+  * certificate-managment.adoc: use xref to refer to chapter_pmxcfs
+
+  * use separate wiki page for qm-cloud-init.adoc
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 16 May 2018 13:11:43 +0200
+
+pve-docs (5.2-3) unstable; urgency=medium
+
+  * installation: extend parameter description
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 14 May 2018 14:47:00 +0200
+
+pve-docs (5.2-2) unstable; urgency=medium
+
+  * cloudinit: improve grammar and wording
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 14 May 2018 14:24:35 +0200
+
+pve-docs (5.2-1) unstable; urgency=medium
+
+  * update generated docs
+
+  * pve-admin-guide.adoc: include pvenode synopsys
+
+  * Makefile: do not use ordered dependencies
+
+  * add documentation for certificate managment
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 14 May 2018 12:31:52 +0200
+
+pve-docs (5.1-18) unstable; urgency=medium
+
+  * update screenshots
+
+  * add pvenode CLI tool chapter and synopsis
+
+  * fix various typos
+
+  * add CIFS documentation
+
+  * general improvements of various paragraphs
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 04 May 2018 13:08:09 +0200
+
+pve-docs (5.1-17) unstable; urgency=medium
+
+  * vzdump: add restore bwlimit docs
+
+  * api-viewer: show full return info if available
+
+  * add 'gen-qm-cloud-init-opts.pl' to doc-gen
+
+  * pvecm: add chapter reference
+
+  * add cloud-init documentation
+
+  * update generated docs
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 22 Mar 2018 13:18:50 +0100
+
+pve-docs (5.1-16) unstable; urgency=medium
+
+  * qm/cpu: add section for PCID flag
+
+  * Add section Ceph CRUSH and device classes for pool assignment
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 10 Jan 2018 11:11:08 +0100
+
+pve-docs (5.1-15) unstable; urgency=medium
+
+  * Fix vzdump backup stop mode description
+
+  * Explain why shut down VMs appear as running when backed up
+
+  * png-verify.pl: allow 72dpcm for pve installer images
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 22 Dec 2017 11:50:16 +0100
+
+pve-docs (5.1-14) unstable; urgency=medium
+
+  * pve-installation.adoc: include screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 22 Dec 2017 11:19:04 +0100
+
+pve-docs (5.1-13) unstable; urgency=medium
+
+  * add replication panel to list of guest panels
+
+  * add xterm.js to options in the console button
+
+  * api-viewer: adapt and add flex for parameter coolumns
+
+  * api-viewer: also show the 'default' schema column
+
+  * Create a 10 gibibytes diskimage instead of 10 gigabytes
+
+  * pveceph: correct filestore examples
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 22 Dec 2017 08:17:54 +0100
+
+pve-docs (5.1-12) unstable; urgency=medium
+
+  * revert broken reference in Ceph documentation
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 23 Oct 2017 12:12:49 +0200
+
+pve-docs (5.1-11) unstable; urgency=medium
+
+  * bump for 5.1 release
+
+  * update Ceph documentation
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 23 Oct 2017 10:35:02 +0200
+
+pve-docs (5.0-10) unstable; urgency=medium
+
+  * fix #1466: fix typos in gui docs
+
+  * pvecm: pve-manager service was renamed to pve-guests
+
+  * add SHA512 checksum for repository key
+
+  * add pvesr synopsis to full page admin guide
+
+  * ha: document ignored state
+
+  * Add a paragraph to explain how network models match use cases
+
+  * qm/cpu: add more documentation about resource limits and NUMA
+
+  * Update the Windows import example to use the qm importovf command
+
+  * Document that active-backup is recommended for corosync
+
+  * pct: add note about storage:size syntax
+
+  * added missing ipv4/ip_forward in routed network section
+
+  * fix and clarify calendar event examples
+
+  * various cleanups and spelling fixes
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 19 Oct 2017 09:30:50 +0200
+
+pve-docs (5.0-9) unstable; urgency=medium
+
+  * Update Dokumentation to Systemd Network Interface Names
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 10 Jul 2017 12:22:37 +0200
+
+pve-docs (5.0-8) unstable; urgency=medium
+
+  * add toplevel attribute to pvepech.adoc
+
+  * do not include binary name 'pveceph' in chapter title
+
+  * use https and full hostname to access mw api
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 04 Jul 2017 14:29:35 +0200
+
+pve-docs (5.0-7) unstable; urgency=medium
+
+  * pve-package-repos.adoc: fix sources.list for pve 5.x
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 04 Jul 2017 13:15:44 +0200
+
+pve-docs (5.0-6) unstable; urgency=medium
+
+  * pve-storage-zfspool.adoc: add link to wiki/ZFS_on_Linux
+
+  * update gui overview screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 03 Jul 2017 13:00:13 +0200
+
+pve-docs (5.0-5) unstable; urgency=medium
+
+  * update screenshots for 5.0 release
+
+  * add replication GUI screenshot
+
+  * update generated docs
+
+  * use rsvg-convert instead of inkscape
+
+  * replication: add chapter reference
+
+  * include pvesr.adoc in pve-admin-guide
+
+  * improve storage replication chapter
+
+  * Fix vzdump information concerning backup and container mount points
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 30 Jun 2017 11:00:20 +0200
+
+pve-docs (5.0-4) unstable; urgency=medium
+
+  * Document Backup and Skip replication options
+
+  * pveceph: do not refer to a specific releas
+
+  * pveceph: improve intro
+
+  * hyper-converged-infrastructure.adoc: improved text
+
+  * pvesr: add documentation for storage replication
+
+  * Fix qm create syntax example
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 28 Jun 2017 12:36:13 +0200
+
+pve-docs (5.0-3) unstable; urgency=medium
+
+  * hyper-converged-infrastructure.adoc: new chapter
+
+  * pveceph: add docs found on our wiki pages
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 21 Jun 2017 10:14:54 +0200
+
+pve-docs (5.0-2) unstable; urgency=medium
+
+  * fix grammar error
+
+  * clarify snapshots on file base storages
+
+  * add section id to usb passhtrough chapter
+
+  * add year 2017 to copyright
+
+  * pvesr.adoc: add dummy man page for storage replication tool
+
+  * update windows guide for usb stick
+
+  * Fix path to block device when creating a file system on a thin volume
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 31 May 2017 09:02:56 +0200
+
+pve-docs (5.0-1) unstable; urgency=medium
+
+  * version bump for Debian stretch (set RELEASE=5.0)
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 11 Mar 2017 08:04:15 +0100
+
+pve-docs (4.4-4) unstable; urgency=medium
+
+  * Document that Sys.Audit allows also to read cluster paramaters
+
+  * qm: note that HA VMs get ignored by auto. start/shutdown
+
+  * the test uncovers problems not covers them up
+
+  * asciidoc-pve: include the PID in the temp file prefix
+
+  * set the PVE_GENERATING_DOCS env var in perl calls
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 11 Mar 2017 07:50:23 +0100
+
+pve-docs (4.4-3) unstable; urgency=medium
+
+  * add status.cfg to the list of files in /etc/pve
+
+  * some small spelling/grammar fixes
+
+  * pve-software-stack.svg: adopt colors
+
+  * add details about online migration for qemu
+
+  * add links to the specific migration chaptes in pvecm
+
+  * pvecm: improve 'RRP on existing clusters' wording
+
+  * pvecm: explain need of storage separation on node separation better
+
+  * Document the difference between Virtio SCSI and Virtio SCSI single
+
+  * Improve cluster node deletion operation
+
+  * document ballooning for fixed memory size
+
+  * pve-gui.adoc: more verbose description
+
+  * Extend the GUI overview.
+
+  * Add Pool level
+
+  * Add storage level.
+
+  * Add section VM Level.
+
+  * qm.adoc: rework clone/template sections
+
+  * qm.adoc: add section about VM clones
+
+  * add new screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 27 Jan 2017 11:19:16 +0100
+
+pve-docs (4.4-2) unstable; urgency=medium
+
+  * small corrections and clarifications
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 29 Dec 2016 07:46:06 +0100
+
+pve-docs (4.4-1) unstable; urgency=medium
+
+  * pve-gui.adoc: new chapter
+
+  * pve-admin-guide.adoc: include chapter pve-gui.adoc
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 09 Dec 2016 11:44:47 +0100
+
+pve-docs (4.3-19) unstable; urgency=medium
+
+  * qm.adoc: add migration subchapter
+
+  * pct.adoc: add migration subchapter
+
+  * generate README.html including a TOC
+
+  * Add a chapter explaining how online help is added to the GUI
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 02 Dec 2016 16:25:22 +0100
+
+pve-docs (4.3-18) unstable; urgency=medium
+
+  * Add useful examples to create/resize a lvm[-thin] pool.
+
+  * pct.adoc: Add General Settings sub chapter
+
+  * pvecm.adoc: add migration settings documentation
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 01 Dec 2016 10:54:03 +0100
+
+pve-docs (4.3-17) unstable; urgency=medium
+
+  * ha-manager.adoc: new section Management Tasks
+
+  * ha-manager.adoc: add missing service states
+
+  * ha-manager.adoc: update screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 23 Nov 2016 11:41:46 +0100
+
+pve-docs (4.3-16) unstable; urgency=medium
+
+  * ha-manager.adoc: many improvments, screenshots
+
+  * update autogenerated docs
+
+  * add screenshot for start/shutdown order
+
+  * pct.adoc: move pct_startup_and_shutdown to correct section
+
+  * Explain start up and shutdown behaviour for containers
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 22 Nov 2016 16:56:41 +0100
+
+pve-docs (4.3-15) unstable; urgency=medium
+
+  * use auto-generated screenshots
+
+  * pmxcfs: add manual guest recovery by moving files
+
+  * pct.adoc: add screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 10 Nov 2016 16:44:06 +0100
+
+pve-docs (4.3-14) unstable; urgency=medium
+
+  * update generated docs
+
+  * add ability to include screenshots
+
+  * qm.adoc: add screenshots
+
+  * README.adoc: add docs about screenshots
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 08 Nov 2016 11:09:30 +0100
+
+pve-docs (4.3-13) unstable; urgency=medium
+
+  * add simple toc generator for wiki pages
+
+  * add code to generate correct footnotes on wiki pages
+
+  * do not include JS/Style inside pvehide tag
+
+  * do not use the <code> tag
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 22 Oct 2016 12:35:29 +0200
+
+pve-docs (4.3-12) unstable; urgency=medium
+
+  * asciidoc-pve: detect and avoid xrefs spanning multiple lines
+
+  * pmxcfs: fix wrong information now covered in pvecm
+
+  * add external metric server to sysadmin.adoc
+
+  * index.adoc: auto generate tables with gen-index-includes.pl
+
+  * rename Download Link to Link
+
+  * Add reference for onlineHelp for HA resource management
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 21 Oct 2016 08:38:05 +0200
+
+pve-docs (4.3-11) unstable; urgency=medium
+
+  * asciidoc-pve: improve rendering of wiki pages
+
+  * move asciidoc related data into asciidoc subdir
+
+  * use the html5 backend for asciidoc
+
+  * bibliography: add Ceph Cookbook
+
+  * Add subchapter documenting the startup/shutdown option
+
+  * howto-improve-pve-docs.adoc: moved from pve-intro.adoc
+
+  * scan-adoc-refs: fix dependency computation (make it recusive)
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 19 Oct 2016 09:52:27 +0200
+
+pve-docs (4.3-10) unstable; urgency=medium
+
+  * pve-docs-mediawiki-import.in: include text version inside pvehide tag
+
+  * pvedocs-include.php: avoid to use javascript
+
+  * pvedocs-include.php: add new mediawiki tag <pvehide>
+
+  * scan-adoc-refs: cleanup makefile generation
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 17 Oct 2016 10:56:07 +0200
+
+pve-docs (4.3-9) unstable; urgency=medium
+
+  * renamed pmxcfs.8-cli.adoc to pmxcfs.8-synopsis.adoc
+
+  * scan-adoc-refs: auto generate dependencies for Makefile
+
+  * embed autogenerated rules inside pve-doc-generator.mk
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 14 Oct 2016 18:32:02 +0200
+
+pve-docs (4.3-8) unstable; urgency=medium
+
+  * pve-docs-mediawiki-import.in: correctly pass category parameter
+
+  * generate output file mappings automatically
+
+  * mark manual pages as toplevel files
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 14 Oct 2016 08:42:13 +0200
+
+pve-docs (4.3-7) unstable; urgency=medium
+
+  * asciidoc-pve.in: add code to auto generate online help data
+
+  * sysadmin: add section about NTP configuration
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 13 Oct 2016 11:14:35 +0200
+
+pve-docs (4.3-6) unstable; urgency=medium
+
+  * asciidoc-pve: new asciidoc preprocessor to fix links
+
+  * scan-adoc-refs: extract information about block IDs
+
+  * pve-doc-generator package: install asciidoc-pve binary
+
+  * fix manpage titles
+
+  * new file pve-docs-mediawiki-import.in (we now use
+    autogenerate data)
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 12 Oct 2016 12:37:10 +0200
+
+pve-docs (4.3-5) unstable; urgency=medium
+
+  * fix titel page (avoid white border on left side)
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 07 Oct 2016 11:28:54 +0200
+
+pve-docs (4.3-4) unstable; urgency=medium
+
+  * add pveperf section and man page
+
+  * pve-docs-mediawiki-import: import new pve-disk-health-monitoring page
+
+  * add section disk health monitoring to sysadmin chapter
+
+  * pct: add section about debug logs via lxc-start
+
+  * add note about certificate HOWTO
+
+  * correct spelling of SYNOPSIS in man pages
+
+  * Update the list of supported web browsers
+
+  * pveum: update everything, describe two factor authentication
+
+  * add pve-usbstick.adoc
+
+  * add sections regarding corosync and cluster network
+
+  * add node sparation without re installation section
+
+  * Merge Bonding form Wiki
+
+  * install/use lvm thin file in pvesm man page
+
+  * Add sub chapter on how to improve the reference documentation
+
+  * Explain Linux Bond and examples
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 07 Oct 2016 10:38:26 +0200
+
+pve-docs (4.3-3) unstable; urgency=medium
+
+  * add missing wiki link to Storage:_ZFS_over_iSCSI
+
+  * new title page for .pdf
+
+  * add logo to admin guide and index
+
+  * do not use macros in manual page titles
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 03 Oct 2016 17:53:37 +0200
+
+pve-docs (4.3-2) unstable; urgency=medium
+
+  * update autogenerated docs
+
+  * ha-manager: add examples to group settings
+
+  * add wiki link to Installation: Tips and Tricks
+
+  * pve-installation.adoc: reorder, cleanups
+
+  * pct: cleanup Technology Overview list
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 29 Sep 2016 12:24:23 +0200
+
+pve-docs (4.3-1) unstable; urgency=medium
+
+  * bump version for new release
+
+  * Add style guide to README
+
+  * pct: extend device mount point section
+
+  * reorder docs (pct after qm)
+
+  * pct: include information about pct restore
+
+  * pct: restructure mount point section
+
+  * pve-package-repos.adoc: add section about SecureApt
+
+  * pve-package-repos: add more info about outdated repositories
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 23 Sep 2016 09:42:27 +0200
+
+pve-docs (4.2-11) unstable; urgency=medium
+
+  * gettinh-help.adoc: remove detailed numbers, because it is difficult to keep
+    them up to data
+
+  * also update 'Get support' wiki page
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 16 Sep 2016 10:58:11 +0200
+
+pve-docs (4.2-10) unstable; urgency=medium
+
+  * Document that virtio-scsi is the recommended controller for PVE >= 4.3
+
+  * add section about bios and uefi
+
+  * add hint about HW RAID
+
+  * refer to Mastering Proxmox - Second Edition
+
+  * add new book from Lee R. Surber
+
+  * Fix PVE API URL
+
+  * include/improve new LVM page (local-lvm.adoc)
+
+  * use/install separate wiki pages for sysadmin.adoc includes
+
+  * pve-network.adoc: move network docu into separate file
+
+  * getting-help.adoc: add/merge infos from current 'Get Support' wiki page
+
+  * improve lxc/pct faqs
+
+  * add ZFS management docs (local-zfs.adoc)
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 16 Sep 2016 08:30:16 +0200
+
+pve-docs (4.2-9) unstable; urgency=medium
+
+  * merge the good parts of the Backup wiki articke
+
+  * merge the good parts of the FAQ wiki articke
+
+  * update apidata.js
+
+  * api-viewer: set the first tab of a page active
+
+  * add section about quorum and cluster cold start
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 06 Sep 2016 06:41:50 +0200
+
+pve-docs (4.2-8) unstable; urgency=medium
+
+  * fix wiki links
+
+  * update for our new mediawiki installation
+
+  * improve docs about default storage configuration
+
+  * add warning about over-provisioning
+
+  * update mediawiki README
+
+  * use new repoman for upload target
+
+  * add new pve-docs-mediawiki package
+
+  * allow other archs than amd64
+
+  * document /etc/gentoo-release test
+
+  * build-deps: dblatex, source-highlight
+
+  * ha-manager: add section for recovery after fencing
+
+  * ha-manager: clarify start failure policy
+
+  * ha-manager: clarifications and various fixes
+
+  * fix #1022 correct typo
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 19 Aug 2016 14:54:02 +0200
+
+pve-docs (4.2-7) unstable; urgency=medium
+
+  * Move Multiqueue and IO Threads description at bottom of each chapter
+
+  * Document network input panel
+
+  * Document the Shares option in Memory panel
+
+  * add section about usb passthrough
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 14 Jun 2016 11:58:05 +0200
+
+pve-docs (4.2-6) unstable; urgency=medium
+
+  * doc: update stdexcludes
+
+  * add note about skipped bind/dev mps
+
+  * add bind mount warning
+
+  * Document CPU and Memory Input panel
+
+  * add paragraph for IO Thread option
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 08 Jun 2016 12:36:43 +0200
+
+pve-docs (4.2-5) unstable; urgency=medium
+
+  * fix package build system (single debian dir)
+
+  * cleanup pve-docs package - only include documentation files
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 25 May 2016 07:17:03 +0200
+
+pve-docs (4.2-3) unstable; urgency=medium
+
+  * update generated docs
+
+  * include options into pct and qm manual page
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 19 May 2016 17:31:19 +0200
+
+pve-docs (4.2-2) unstable; urgency=medium
+
+  * update generated docs
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 11 May 2016 11:12:03 +0200
+
+pve-docs (4.2-1) unstable; urgency=medium
+
+  * set RELEASE to 4.2
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 29 Apr 2016 09:26:04 +0200
+
+pve-docs (4.1-1) unstable; urgency=medium
+
+  * first release
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 05 Apr 2016 18:02:59 +0200
+

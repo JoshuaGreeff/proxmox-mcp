@@ -1,0 +1,36 @@
+`ebtables`: `<boolean>` ('default =' `1`)::
+
+Enable ebtables rules cluster wide.
+
+`enable`: `<integer> (0 - N)` ('default =' `0`)::
+
+Enable or disable the firewall cluster wide.
+
+`log_ratelimit`: `[enable=]<1|0> [,burst=<integer>] [,rate=<rate>]` ::
+
+Log ratelimiting settings
+
+`burst`=`<integer> (0 - N)` ('default =' `5`);;
+
+Initial burst of packages which will always get logged before the rate is applied
+
+`enable`=`<boolean>` ('default =' `1`);;
+
+Enable or disable log rate limiting
+
+`rate`=`<rate>` ('default =' `1/second`);;
+
+Frequency with which the burst bucket gets refilled
+
+`policy_forward`: `<ACCEPT | DROP>` ::
+
+Forward policy.
+
+`policy_in`: `<ACCEPT | DROP | REJECT>` ::
+
+Input policy.
+
+`policy_out`: `<ACCEPT | DROP | REJECT>` ::
+
+Output policy.
+

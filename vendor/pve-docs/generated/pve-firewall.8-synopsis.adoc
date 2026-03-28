@@ -1,0 +1,92 @@
+[[cli_pve-firewall]]
+*pve-firewall* `<COMMAND> [ARGS] [OPTIONS]`
+
+[[cli_pve-firewall_compile]]
+*pve-firewall compile*
+
+Compile and print firewall rules. This is useful for testing.
+
+[[cli_pve-firewall_help]]
+*pve-firewall help* `[OPTIONS]`
+
+Get help about specified command.
+
+`--extra-args` `<array>` ::
+
+Shows help for a specific command
+
+`--verbose` `<boolean>` ::
+
+Verbose output format.
+
+[[cli_pve-firewall_localnet]]
+*pve-firewall localnet*
+
+Print information about local network.
+
+[[cli_pve-firewall_restart]]
+*pve-firewall restart*
+
+Restart the Proxmox VE firewall service.
+
+[[cli_pve-firewall_simulate]]
+*pve-firewall simulate* `[OPTIONS]`
+
+Simulate firewall rules. This does not simulates the kernel 'routing'
+table, but simply assumes that routing from source zone to destination zone
+is possible.
+
+`--dest` `<string>` ::
+
+Destination IP address.
+
+`--dport` `<integer>` ::
+
+Destination port.
+
+`--from` `(host|outside|vm\d+|ct\d+|([a-zA-Z][a-zA-Z0-9]{0,9})/(\S+))` ('default =' `outside`)::
+
+Source zone.
+
+`--protocol` `(tcp|udp)` ('default =' `tcp`)::
+
+Protocol.
+
+`--source` `<string>` ::
+
+Source IP address.
+
+`--sport` `<integer>` ::
+
+Source port.
+
+`--to` `(host|outside|vm\d+|ct\d+|([a-zA-Z][a-zA-Z0-9]{0,9})/(\S+))` ('default =' `host`)::
+
+Destination zone.
+
+`--verbose` `<boolean>` ('default =' `0`)::
+
+Verbose output.
+
+[[cli_pve-firewall_start]]
+*pve-firewall start* `[OPTIONS]`
+
+Start the Proxmox VE firewall service.
+
+`--debug` `<boolean>` ('default =' `0`)::
+
+Debug mode - stay in foreground
+
+[[cli_pve-firewall_status]]
+*pve-firewall status*
+
+Get firewall status.
+
+[[cli_pve-firewall_stop]]
+*pve-firewall stop*
+
+Stop the Proxmox VE firewall service. Note, stopping actively removes all
+Proxmox VE related iptable rules rendering the host potentially
+unprotected.
+
+

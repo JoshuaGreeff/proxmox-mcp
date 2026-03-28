@@ -1,0 +1,103 @@
+[[cli_pvesh]]
+*pvesh* `<COMMAND> [ARGS] [OPTIONS]`
+
+[[cli_pvesh_create]]
+*pvesh create* `<api_path>` `[OPTIONS]` `[FORMAT_OPTIONS]`
+
+Call API POST on <api_path>.
+
+`<api_path>`: `<string>` ::
+
+API path.
+
+`--noproxy` `<boolean>` ::
+
+Disable automatic proxying.
+
+[[cli_pvesh_delete]]
+*pvesh delete* `<api_path>` `[OPTIONS]` `[FORMAT_OPTIONS]`
+
+Call API DELETE on <api_path>.
+
+`<api_path>`: `<string>` ::
+
+API path.
+
+`--noproxy` `<boolean>` ::
+
+Disable automatic proxying.
+
+[[cli_pvesh_get]]
+*pvesh get* `<api_path>` `[OPTIONS]` `[FORMAT_OPTIONS]`
+
+Call API GET on <api_path>.
+
+`<api_path>`: `<string>` ::
+
+API path.
+
+`--noproxy` `<boolean>` ::
+
+Disable automatic proxying.
+
+[[cli_pvesh_help]]
+*pvesh help* `[OPTIONS]`
+
+Get help about specified command.
+
+`--extra-args` `<array>` ::
+
+Shows help for a specific command
+
+`--verbose` `<boolean>` ::
+
+Verbose output format.
+
+[[cli_pvesh_ls]]
+*pvesh ls* `<api_path>` `[OPTIONS]` `[FORMAT_OPTIONS]`
+
+List child objects on <api_path>.
+
+`<api_path>`: `<string>` ::
+
+API path.
+
+`--noproxy` `<boolean>` ::
+
+Disable automatic proxying.
+
+[[cli_pvesh_set]]
+*pvesh set* `<api_path>` `[OPTIONS]` `[FORMAT_OPTIONS]`
+
+Call API PUT on <api_path>.
+
+`<api_path>`: `<string>` ::
+
+API path.
+
+`--noproxy` `<boolean>` ::
+
+Disable automatic proxying.
+
+[[cli_pvesh_usage]]
+*pvesh usage* `<api_path>` `[OPTIONS]`
+
+print API usage information for <api_path>.
+
+`<api_path>`: `<string>` ::
+
+API path.
+
+`--command` `<create | delete | get | set>` ::
+
+API command.
+
+`--returns` `<boolean>` ::
+
+Including schema for returned data.
+
+`--verbose` `<boolean>` ::
+
+Verbose output format.
+
+

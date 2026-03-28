@@ -1,0 +1,70 @@
+%%
+%% This style is derived from the docbook one.
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{asciidoc-proxmox}[2016/10/30 AsciiDoc DocBook Style]
+
+% this will set letterpaper, because docbook.sty honors page layout
+% made by geometry package
+%\usepackage[letterpaper,total={7.25in,9.25in}, top=1in]{geometry}
+%\usepackage[a4paper]{geometry}
+
+\usepackage[a4paper, left=2cm, right=1cm, top=2.5cm, bottom=2cm ]{geometry}
+
+%% Just use the original package and pass the options.
+\RequirePackageWithOptions{docbook}
+
+% Sidebar is a boxed minipage that can contain verbatim.
+% Changed shadow box to double box.
+\renewenvironment{sidebar}[1][0.95\textwidth]{
+  \hspace{0mm}\newline%
+  \noindent\begin{Sbox}\begin{minipage}{#1}%
+  \setlength\parskip{\medskipamount}%
+}{
+  \end{minipage}\end{Sbox}\doublebox{\TheSbox}%
+}
+
+% use parbox for description labels to allow line breaks
+\renewcommand\descriptionlabel[1]{
+  \parbox[t]{\linewidth}{\raggedright\bfseries #1\smallskip}}
+
+% For DocBook literallayout elements, see `./dblatex/dblatex-readme.txt`.
+\usepackage{alltt}
+% To preserve simple quotes in the blocks of code
+\usepackage{upquote}
+
+\definecolor{proxmoxred}{RGB}{229, 112, 0}
+\definecolor{proxmoxgrey1}{RGB}{229, 229, 229}
+
+\def\drawtitlepage{
+  \AddToShipoutPicture*{
+    \put(\LenToUnit{0cm},\LenToUnit{2.5cm}){
+      {\color{proxmoxgrey1}\rule{\paperwidth}{22cm}}}
+    \put(\LenToUnit{\dimexpr(\paperwidth-11cm)},
+         \LenToUnit{\dimexpr(\paperheight-3.5cm)}){
+      \includegraphics[width=10cm]{proxmox-logo}}
+  }
+}
+
+% custom cover page
+\def\DBKcover{
+  \thispagestyle{empty}
+  \vspace*{4cm}
+  \sffamily
+  \begin{center}
+    {\Huge \scshape \color{proxmoxred}  \DBKtitle \\[0.5cm]}
+    {\Large \scshape \DBKsubtitle \\[1cm]}
+    {\includegraphics[width=132mm]{proxmox-ci-header} \\}
+  \end{center}
+  \vfill
+  \begin{flushright}
+    {\Large \sffamily
+      \DBKdate \\
+      Proxmox Server Solutions GmbH \\
+      \color{proxmoxred} www.proxmox.com \\
+    }
+  \end{flushright}
+  \vspace*{1cm}
+  \drawtitlepage
+  \pagebreak[4]
+}

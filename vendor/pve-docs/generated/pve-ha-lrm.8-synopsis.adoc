@@ -1,0 +1,36 @@
+[[cli_pve-ha-lrm]]
+*pve-ha-lrm* `<COMMAND> [ARGS] [OPTIONS]`
+
+[[cli_pve-ha-lrm_help]]
+*pve-ha-lrm help* `[OPTIONS]`
+
+Get help about specified command.
+
+`--extra-args` `<array>` ::
+
+Shows help for a specific command
+
+`--verbose` `<boolean>` ::
+
+Verbose output format.
+
+[[cli_pve-ha-lrm_start]]
+*pve-ha-lrm start* `[OPTIONS]`
+
+Start the daemon.
+
+`--debug` `<boolean>` ('default =' `0`)::
+
+Debug mode - stay in foreground
+
+[[cli_pve-ha-lrm_status]]
+*pve-ha-lrm status*
+
+Get daemon status.
+
+[[cli_pve-ha-lrm_stop]]
+*pve-ha-lrm stop*
+
+Stop the daemon.
+
+

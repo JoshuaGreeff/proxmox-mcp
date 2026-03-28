@@ -1,0 +1,352 @@
+ifdef::pvelogo[]
+image:./images/proxmox-logo.svg[] pass:[<br>] Proxmox VE Administration Guide
+=============================================================================
+endif::pvelogo[]
+ifndef::pvelogo[]
+Proxmox VE Administration Guide
+===============================
+endif::pvelogo[]
+:doctype:   book
+:title: Proxmox VE Administration Guide
+:toc2:
+:numbered:
+:data-uri:
+:icons:
+ifndef::wiki[]
+ifndef::manvolnum[]
+:pve-toplevel:
+
+// Push titles down one level.
+:leveloffset: 1
+
+include::pve-intro.adoc[]
+
+include::pve-installation.adoc[]
+
+include::sysadmin.adoc[]
+
+include::pve-gui.adoc[]
+
+include::pvecm.adoc[]
+
+include::pmxcfs.adoc[]
+
+include::pvesm.adoc[]
+
+include::pveceph.adoc[]
+
+include::pvesr.adoc[]
+
+include::qm.adoc[]
+
+include::pct.adoc[]
+
+include::pvesdn.adoc[]
+
+include::pve-firewall.adoc[]
+
+include::pveum.adoc[]
+
+include::ha-manager.adoc[]
+
+include::vzdump.adoc[]
+
+include::notifications.adoc[]
+
+// Return to normal title levels.
+:leveloffset: 0
+
+Important Service Daemons
+-------------------------
+
+:leveloffset: 2
+include::pvedaemon.adoc[]
+
+include::pveproxy.adoc[]
+
+include::pvestatd.adoc[]
+
+include::spiceproxy.adoc[]
+
+include::pvescheduler.adoc[]
+
+:leveloffset: 0
+
+
+Useful Command-line Tools
+-------------------------
+
+:leveloffset: 2
+
+include::pvesubscription.adoc[]
+
+include::pveperf.adoc[]
+
+include::pvesh.adoc[]
+
+:leveloffset: 1
+
+include::pve-faq.adoc[]
+
+include::pve-bibliography.adoc[]
+
+:leveloffset: 0
+
+[appendix]
+Command-line Interface
+----------------------
+
+:leveloffset: 1
+
+include::cli-general.adoc[]
+
+include::output-format.adoc[]
+
+:leveloffset: 0
+
+
+*pvesm* - {pve} Storage Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvesm.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvesubscription* - {pve} Subscription Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvesubscription.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pveperf* - {pve} Benchmark Script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pveperf.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pveceph* - Manage CEPH Services on {pve} Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pveceph.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvenode* - {pve} Node Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvenode.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvesh* - Shell interface for the {pve} API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvesh.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*qm* - QEMU/KVM Virtual Machine Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/qm.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*qmrestore* - Restore QemuServer `vzdump` Backups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/qmrestore.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pct* - Proxmox Container Toolkit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pct.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pveam* -  {pve} Appliance Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pveam.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvecm* - {pve} Cluster Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvecm.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvesr* - {pve} Storage Replication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvesr.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+
+*pveum* - {pve} User Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pveum.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*vzdump* - Backup Utility for VMs and Containers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/vzdump.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+*ha-manager* - {pve} HA Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/ha-manager.1-synopsis.adoc[]
+
+:leveloffset: 0
+
+
+[appendix]
+Service Daemons
+---------------
+
+*pve-firewall* - {pve} Firewall Daemon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pve-firewall.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvedaemon* - {pve} API Daemon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvedaemon.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pveproxy* - {pve} API Proxy Daemon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+
+include::generated/pveproxy.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvestatd* - {pve} Status Daemon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvestatd.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*spiceproxy* - SPICE Proxy Service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+
+include::generated/spiceproxy.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pmxcfs* - Proxmox Cluster File System
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pmxcfs.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pve-ha-crm* - Cluster Resource Manager Daemon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pve-ha-crm.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pve-ha-lrm* - Local Resource Manager Daemon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pve-ha-lrm.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+*pvescheduler* - {pve} Scheduler Daemon
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:leveloffset: 1
+include::generated/pvescheduler.8-synopsis.adoc[]
+
+:leveloffset: 0
+
+[appendix]
+Configuration Files
+-------------------
+
+:leveloffset: 2
+include::configuration-files.adoc[]
+
+:leveloffset: 0
+
+[appendix]
+Calendar Events
+---------------
+
+:leveloffset: 1
+include::calendar-events.adoc[]
+
+:leveloffset: 0
+
+[appendix]
+QEMU vCPU List
+--------------
+
+:leveloffset: 1
+include::qm-vcpu-list.adoc[]
+
+:leveloffset: 0
+
+[appendix]
+Firewall Macro Definitions
+--------------------------
+
+include::generated/pve-firewall-macros.adoc[]
+
+:leveloffset: 1
+[appendix]
+include::markdown-primer.adoc[]
+
+:leveloffset: 1
+[appendix]
+include::GFDL.adoc[]
+
+:leveloffset: 0
+
+endif::manvolnum[]
+endif::wiki[]

@@ -1,0 +1,41 @@
+[[cli_pveproxy]]
+*pveproxy* `<COMMAND> [ARGS] [OPTIONS]`
+
+[[cli_pveproxy_help]]
+*pveproxy help* `[OPTIONS]`
+
+Get help about specified command.
+
+`--extra-args` `<array>` ::
+
+Shows help for a specific command
+
+`--verbose` `<boolean>` ::
+
+Verbose output format.
+
+[[cli_pveproxy_restart]]
+*pveproxy restart*
+
+Restart the daemon (or start if not running).
+
+[[cli_pveproxy_start]]
+*pveproxy start* `[OPTIONS]`
+
+Start the daemon.
+
+`--debug` `<boolean>` ('default =' `0`)::
+
+Debug mode - stay in foreground
+
+[[cli_pveproxy_status]]
+*pveproxy status*
+
+Get daemon status.
+
+[[cli_pveproxy_stop]]
+*pveproxy stop*
+
+Stop the daemon.
+
+

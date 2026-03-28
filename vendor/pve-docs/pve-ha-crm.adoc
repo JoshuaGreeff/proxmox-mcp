@@ -1,0 +1,30 @@
+ifdef::manvolnum[]
+pve-ha-crm(8)
+=============
+:pve-toplevel:
+
+NAME
+----
+
+pve-ha-crm - PVE Cluster Resource Manager Daemon
+
+
+SYNOPSIS
+--------
+
+include::generated/pve-ha-crm.8-synopsis.adoc[]
+
+DESCRIPTION
+-----------
+endif::manvolnum[]
+
+ifndef::manvolnum[]
+Cluster Resource Manager Daemon
+================================
+endif::manvolnum[]
+
+This is the Cluster Resource Manager Daemon.
+
+ifdef::manvolnum[]
+include::pve-copyright.adoc[]
+endif::manvolnum[]

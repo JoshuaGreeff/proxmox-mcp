@@ -1,0 +1,41 @@
+[[cli_spiceproxy]]
+*spiceproxy* `<COMMAND> [ARGS] [OPTIONS]`
+
+[[cli_spiceproxy_help]]
+*spiceproxy help* `[OPTIONS]`
+
+Get help about specified command.
+
+`--extra-args` `<array>` ::
+
+Shows help for a specific command
+
+`--verbose` `<boolean>` ::
+
+Verbose output format.
+
+[[cli_spiceproxy_restart]]
+*spiceproxy restart*
+
+Restart the daemon (or start if not running).
+
+[[cli_spiceproxy_start]]
+*spiceproxy start* `[OPTIONS]`
+
+Start the daemon.
+
+`--debug` `<boolean>` ('default =' `0`)::
+
+Debug mode - stay in foreground
+
+[[cli_spiceproxy_status]]
+*spiceproxy status*
+
+Get daemon status.
+
+[[cli_spiceproxy_stop]]
+*spiceproxy stop*
+
+Stop the daemon.
+
+

@@ -1,0 +1,102 @@
+[[chapter_system_administration]]
+Host System Administration
+==========================
+ifndef::manvolnum[]
+:pve-toplevel:
+endif::manvolnum[]
+
+The following sections will focus on common virtualization tasks and explain the
+{pve} specifics regarding the administration and management of the host machine.
+
+{pve} is based on https://www.debian.org/[Debian GNU/Linux] with additional
+repositories to provide the {pve} related packages. This means that the full
+range of Debian packages is available including security updates and bug fixes.
+{pve} provides its own Linux kernel based on the Ubuntu kernel. It has all the
+necessary virtualization and container features enabled and includes
+https://zfsonlinux.org[ZFS] and several extra hardware drivers.
+
+For other topics not included in the following sections, please refer to the
+Debian documentation. The
+https://debian-handbook.info/get[Debian
+Administrator\'s Handbook] is available online, and provides a comprehensive
+introduction to the Debian operating system (see xref:Hertzog13[]).
+
+ifdef::wiki[]
+
+See Also
+--------
+
+* link:/wiki/Package_Repositories[Package Repositories]
+
+* link:/wiki/Network_Configuration[Network Configuration]
+
+* link:/wiki/System_Software_Updates[System Software Updates]
+
+* link:/wiki/Firmware_Updates[Firmware Updates]
+
+* link:/wiki/Host_Bootloader[Host Bootloader]
+
+* link:/wiki/Time_Synchronization[Time Synchronization]
+
+* link:/wiki/External_Metric_Server[External Metric Server]
+
+* link:/wiki/Disk_Health_Monitoring[Disk Health Monitoring]
+
+* link:/wiki/Logical_Volume_Manager_(LVM)[Logical Volume Manager (LVM)]
+
+* link:/wiki/ZFS_on_Linux[ZFS on Linux]
+
+* link:/wiki/BTRFS[BTRFS]
+
+* link:/wiki/Certificate_Management[Certificate Management]
+
+* link:/wiki/Kernel_Samepage_Merging_(KSM)[Kernel Samepage Merging (KSM)]
+
+endif::wiki[]
+
+
+ifndef::wiki[]
+
+include::pve-package-repos.adoc[]
+
+include::system-software-updates.adoc[]
+
+include::firmware-updates.adoc[]
+
+include::pve-network.adoc[]
+
+include::system-timesync.adoc[]
+
+include::pve-external-metric-server.adoc[]
+
+include::pve-disk-health-monitoring.adoc[]
+
+include::local-lvm.adoc[]
+
+include::local-zfs.adoc[]
+
+include::local-btrfs.adoc[]
+
+include::pvenode.adoc[]
+
+include::certificate-management.adoc[]
+
+include::system-booting.adoc[]
+
+include::kernel-samepage-merging.adoc[]
+
+endif::wiki[]
+
+
+////
+TODO:
+
+Working with 'systemd'
+----------------------
+
+Journal and syslog
+~~~~~~~~~~~~~~~~~~
+
+TODO: explain persistent journal...
+
+////

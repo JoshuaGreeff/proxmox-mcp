@@ -1,0 +1,116 @@
+DOCRELEASE=@RELEASE@
+
+DGDIR?=/usr/share/pve-doc-generator
+GENSCRIPTDIR?=${DGDIR}
+
+ASCIIDOC_PVE?=/usr/bin/asciidoc-pve
+
+PERL_DOC_ENV=PVE_GENERATING_DOCS=1
+PERL_DOC_INC_DIRS:=${PERL_DOC_INC_DIRS} .
+PERL_DOC_INC=$(foreach dir,${PERL_DOC_INC_DIRS},-I${dir})
+
+PVE_COMMON_DOC_SOURCES=                 \
+	${ASCIIDOC_PVE}			\
+	pve-copyright.adoc              \
+	docinfo.xml
+
+all:
+
+attributes.txt docinfo.xml:
+	cp ${DGDIR}/$@ $@.tmp
+	mv $@.tmp $@
+
+generated/pmxcfs.8-synopsis.adoc generated/qmeventd.8-synopsis.adoc:
+	@mkdir -p generated
+	cp ${DGDIR}/$(notdir $@) $@.tmp
+	mv $@.tmp $@
+
+generated/%-opts.adoc: ${GENSCRIPTDIR}/gen-%-opts.pl
+	@mkdir -p generated
+	$(PERL_DOC_ENV) perl ${PERL_DOC_INC} ${GENSCRIPTDIR}/gen-$*-opts.pl >$@.tmp
+	mv $@.tmp $@
+
+generated/%.adoc: ${GENSCRIPTDIR}/gen-%-adoc.pl
+	@mkdir -p generated
+	$(PERL_DOC_ENV) perl ${PERL_DOC_INC} ${GENSCRIPTDIR}/gen-$*-adoc.pl >$@.tmp
+	mv $@.tmp $@
+
+generated/pveperf.1-synopsis.adoc:
+	@mkdir -p generated
+	echo '*pveperf* `[PATH]`' > generated/pveperf.1-synopsis.adoc
+
+generated/%.1-synopsis.adoc:
+	@mkdir -p generated
+	$(PERL_DOC_ENV) perl ${PERL_DOC_INC} -e "use PVE::CLI::$(subst -,_,$*);print PVE::CLI::$(subst -,_,$*)->generate_asciidoc_synopsis();" > $@.tmp
+	mv $@.tmp $@
+
+generated/%.8-synopsis.adoc:
+	@mkdir -p generated
+	$(PERL_DOC_ENV) perl ${PERL_DOC_INC} -e "use PVE::Service::$(subst -,_,$*);print PVE::Service::$(subst -,_,$*)->generate_asciidoc_synopsis();" > $@.tmp
+	mv $@.tmp $@
+
+ifneq (${DGDIR},.)
+%.adoc: ${DGDIR}/%.adoc
+	cp $< $@.tmp
+	mv $@.tmp $@
+endif
+
+%.service-bash-completion:
+	perl ${PERL_DOC_INC} -T -e "use PVE::Service::$*; PVE::Service::$*->generate_bash_completions();" >$@.tmp
+	mv $@.tmp $@
+
+%.bash-completion:
+	perl ${PERL_DOC_INC} -T -e "use PVE::CLI::$*; PVE::CLI::$*->generate_bash_completions();" >$@.tmp
+	mv $@.tmp $@
+
+%.service-zsh-completion:
+	perl ${PERL_DOC_INC} -T -e "use PVE::Service::$*; PVE::Service::$*->generate_zsh_completions();" >$@.tmp
+	mv $@.tmp $@
+
+%.zsh-completion:
+	perl ${PERL_DOC_INC} -T -e "use PVE::CLI::$*; PVE::CLI::$*->generate_zsh_completions();" >$@.tmp
+	mv $@.tmp $@
+
+%.service-api-verified:
+	perl ${PERL_DOC_INC} -T -e "use PVE::Service::$*; PVE::Service::$*->verify_api();"
+	touch $@
+
+%.api-verified:
+	perl ${PERL_DOC_INC} -T -e "use PVE::CLI::$*; PVE::CLI::$*->verify_api();"
+	touch $@
+
+%-plain.html: %.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-wiki -o $@ $*.adoc
+
+chapter-%.html: %.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-chapter -o $@ $*.adoc
+
+%.1: %.adoc generated/%.1-synopsis.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-man -o $@ $*.adoc
+	test -z "$${PVE_DOC_INSTANTVIEW}" || man -l $@
+
+%.1.html: %.adoc generated/%.1-synopsis.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-man-html -o $@ $*.adoc
+
+%.8: %.adoc generated/%.8-synopsis.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-man -o $@ $*.adoc
+	test -z "$${PVE_DOC_INSTANTVIEW}" || man -l $@
+
+%.8.html: %.adoc generated/%.8-synopsis.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-man-html -o $@ $*.adoc
+
+%.5: %.adoc generated/%.5-opts.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-man -o $@ $*.adoc
+	test -z "$${PVE_DOC_INSTANTVIEW}" || man -l $@
+
+%.5.html: %.adoc generated/%.5-opts.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-man-html -o $@ $*.adoc
+
+%.5-plain.html: %.adoc generated/%.5-opts.adoc ${PVE_COMMON_DOC_SOURCES}
+	${ASCIIDOC_PVE} compile-man-wiki -o $@ $*.adoc
+
+
+.PHONY: cleanup-docgen
+cleanup-docgen:
+	rm -f *.xml.tmp *.1 *.5 *.8 *.adoc docinfo.xml
+	rm -rf generated

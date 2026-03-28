@@ -1,0 +1,32 @@
+[[howto_improve_pve_docs]]
+Improving the {pve} Documentation
+---------------------------------
+ifdef::wiki[]
+:pve-toplevel:
+endif::wiki[]
+
+Contributions and improvements to the {pve} documentation are always welcome.
+There are several ways to contribute.
+
+If you find errors or other room for improvement in this documentation, please
+file a bug at the https://bugzilla.proxmox.com/[Proxmox bug tracker] to propose
+a correction.
+
+If you want to propose new content, choose one of the following options:
+
+* The wiki: For specific setups, how-to guides, or tutorials the wiki   is the
+right option to contribute.
+
+* The reference documentation: For general content that will be   helpful to all
+  users please propose your contribution for the   reference documentation. This
+  includes all information about how to install, configure, use, and
+  troubleshoot {pve} features. The reference documentation is written in the
+  https://en.wikipedia.org/wiki/AsciiDoc[asciidoc format]. To edit the
+  documentation you need to clone the git repository at
+  `git://git.proxmox.com/git/pve-docs.git`; then follow the
+  https://git.proxmox.com/?p=pve-docs.git;a=blob_plain;f=README.adoc;hb=HEAD[README.adoc]
+  document.
+
+NOTE: If you are interested in working on the {pve} codebase, the
+{webwiki-url}Developer_Documentation[Developer Documentation] wiki article will
+show you where to start.

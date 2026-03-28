@@ -1,0 +1,82 @@
+System Requirements
+-------------------
+ifdef::wiki[]
+:pve-toplevel:
+endif::wiki[]
+
+We recommend using high quality server hardware, when running {pve} in
+production. To further decrease the impact of a failed host, you can run {pve} in
+a cluster with highly available (HA) virtual machines and containers.
+
+{pve} can use local storage (DAS), SAN, NAS, and distributed storage like Ceph
+RBD. For details see xref:chapter_storage[chapter storage].
+
+[[install_minimal_requirements]]
+Minimum Requirements, for Evaluation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These minimum requirements are for evaluation purposes only and should not be
+used in production.
+
+* CPU: 64bit (Intel 64 or AMD64)
+
+* Intel VT/AMD-V capable CPU/motherboard for KVM full virtualization support
+
+* RAM: 1 GB RAM, plus additional RAM needed for guests
+
+* Hard drive
+
+* One network card (NIC)
+
+
+[[install_recommended_requirements]]
+Recommended System Requirements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Intel 64 or AMD64 with Intel VT/AMD-V CPU flag.
+
+* Memory: Minimum 2 GB for the OS and {pve} services, plus designated memory for
+  guests. For Ceph and ZFS, additional memory is required; approximately 1GB of
+  memory for every TB of used storage.
+
+* Fast and redundant storage, best results are achieved with SSDs.
+
+* OS storage: Use a hardware RAID with battery protected write cache (``BBU'')
+  or non-RAID with ZFS (optional SSD for ZIL).
+
+* VM storage:
+** For local storage, use either a hardware RAID with battery backed write cache
+  (BBU) or non-RAID for ZFS and Ceph. Neither ZFS nor Ceph are compatible with a
+  hardware RAID controller.
+** Shared and distributed storage is possible.
+** SSDs with Power-Loss-Protection (PLP) are recommended for good performance.
+  Using consumer SSDs is discouraged.
+
+* Redundant (Multi-)Gbit NICs, with additional NICs depending on the preferred
+  storage technology and cluster setup.
+
+* For PCI(e) passthrough the CPU needs to support the VT-d/AMD-d flag.
+
+
+Simple Performance Overview
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get an overview of the CPU and hard disk performance on an installed {pve}
+system, run the included `pveperf` tool.
+
+NOTE: This is just a very quick and general benchmark. More detailed tests are
+recommended, especially regarding the I/O performance of your system.
+
+Supported Web Browsers for Accessing the Web Interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To access the web-based user interface, we recommend using one of the following
+browsers:
+
+* Firefox, a release from the current year, or the latest Extended Support Release
+* Chrome, a release from the current year
+* Microsoft's currently supported version of Edge
+* Safari, a release from the current year
+
+When accessed from a mobile device, {pve} will show a lightweight, touch-based
+interface.

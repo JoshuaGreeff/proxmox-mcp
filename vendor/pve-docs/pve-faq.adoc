@@ -1,0 +1,183 @@
+Frequently Asked Questions
+==========================
+ifndef::manvolnum[]
+:pve-toplevel:
+endif::manvolnum[]
+ifdef::wiki[]
+:title: FAQ
+endif::wiki[]
+
+NOTE: New FAQs are appended to the bottom of this section.
+
+/////////////////////////////////////////////////////////////////
+ADD NEW FAQS TO THE BOTTOM OF THIS SECTION TO MAINTAIN NUMBERING
+/////////////////////////////////////////////////////////////////
+
+[qanda]
+
+What distribution is {pve} based on?::
+
+{pve} is based on https://www.debian.org[Debian GNU/Linux]
+
+What license does the {pve} project use?::
+
+{pve} code is licensed under the GNU Affero General Public License,
+version 3.
+
+Will {pve} run on a 32bit processor?::
+
+{pve} works only on 64-bit CPUs (AMD or Intel). There is no plan
+for 32-bit for the platform.
++
+NOTE: VMs and Containers can be both 32-bit and 64-bit.
+
+Does my CPU support virtualization?::
+
+To check if your CPU is virtualization compatible, check for the `vmx`
+or `svm` tag in this command output:
++
+----
+egrep '(vmx|svm)' /proc/cpuinfo
+----
+
+Supported Intel CPUs::
+
+64-bit processors with
+https://en.wikipedia.org/wiki/Virtualization_Technology#Intel_virtualization_.28VT-x.29[Intel
+Virtualization Technology (Intel VT-x)] support.
+(https://ark.intel.com/content/www/us/en/ark/search/featurefilter.html?productType=873&2_VTX=True&2_InstructionSet=64-bit[List of processors with Intel VT and 64-bit])
+
+Supported AMD CPUs::
+
+64-bit processors with
+https://en.wikipedia.org/wiki/Virtualization_Technology#AMD_virtualization_.28AMD-V.29[AMD
+Virtualization Technology (AMD-V)] support.
+
+What is a container/virtual environment (VE)/virtual private server (VPS)?::
+
+In the context of containers, these terms all refer to the concept of
+operating-system-level virtualization. Operating-system-level virtualization is
+a method of virtualization, in which the kernel of an operating system
+allows for multiple isolated instances, that all share the kernel. When
+referring to LXC, we call such instances containers. Because containers use the
+host's kernel rather than emulating a full operating system, they require less
+overhead, but are limited to Linux guests.
+
+What is a QEMU/KVM guest (or VM)?::
+
+A QEMU/KVM guest (or VM) is a guest system running virtualized under
+{pve} using QEMU and the Linux KVM kernel module.
+
+What is QEMU?::
+
+QEMU is a generic and open source machine emulator and
+virtualizer. QEMU uses the Linux KVM kernel module to achieve near
+native performance by executing the guest code directly on the host
+CPU.
+It is not limited to Linux guests but allows arbitrary operating systems
+to run.
+
+[[faq-support-table]]
+How long will my {pve} version be supported?::
+
+{pve} versions are supported at least as long as the corresponding
+Debian version, i.e. approximately 3 years after its initial release,
+see https://www.debian.org/security/faq#lifespan[Debian lifespan].
+{pve} uses a
+rolling release model and using the latest stable version is always
+recommended.
++
+[width="100%",cols="5*d",options="header"]
+|===============================================================================
+| {pve} Version | Debian Version      | First Release | Debian EOL | Proxmox EOL
+| {pve} 9       | Debian 13 (Trixie)  | 2025-08       | tba        | tba
+| {pve} 8       | Debian 12 (Bookworm)| 2023-06       | 2026-08    | 2026-08
+| {pve} 7       | Debian 11 (Bullseye)| 2021-07       | 2024-07    | 2024-07
+| {pve} 6       | Debian 10 (Buster)  | 2019-07       | 2022-09    | 2022-09
+| {pve} 5       | Debian 9 (Stretch)  | 2017-07       | 2020-07    | 2020-07
+| {pve} 4       | Debian 8 (Jessie)   | 2015-10       | 2018-06    | 2018-06
+| {pve} 3       | Debian 7 (Wheezy)   | 2013-05       | 2016-04    | 2017-02
+| {pve} 2       | Debian 6 (Squeeze)  | 2012-04       | 2014-05    | 2014-05
+| {pve} 1       | Debian 5 (Lenny)    | 2008-10       | 2012-03    | 2013-01
+|===============================================================================
+
+[[faq-upgrade]]
+How can I upgrade {pve} to the next point release?::
+
+Minor version upgrades, for example upgrading from {pve} in version 8.1
+to 8.2 or 8.3, can be done just like any normal update.
+But you should still check the https://pve.proxmox.com/wiki/Roadmap[release notes]
+for any relevant notable, or breaking change.
++
+For the update itself use either the Web UI __Node -> Updates__ panel or
+through the CLI with:
++
+----
+apt update
+apt full-upgrade
+----
++
+NOTE: Always ensure you correctly setup the
+xref:sysadmin_package_repositories[package repositories] and only
+continue with the actual upgrade if `apt update` did not hit any error.
+
+[[faq-upgrade-major]]
+How can I upgrade {pve} to the next major release?::
+
+Major version upgrades, for example going from {pve} 8.4 to 9.0, are also
+supported.
+They must be carefully planned and tested and should *never* be started without
+having a current backup ready.
++
+Although the specific upgrade steps depend on your respective setup, we provide
+general instructions and advice on how an upgrade should be performed:
++
+* https://pve.proxmox.com/wiki/Upgrade_from_8_to_9[Upgrade from {pve} 8 to 9]
+
+* https://pve.proxmox.com/wiki/Upgrade_from_7_to_8[Upgrade from {pve} 7 to 8]
+
+* https://pve.proxmox.com/wiki/Upgrade_from_6.x_to_7.0[Upgrade from {pve} 6 to 7]
+
+* https://pve.proxmox.com/wiki/Upgrade_from_5.x_to_6.0[Upgrade from {pve} 5 to 6]
+
+* https://pve.proxmox.com/wiki/Upgrade_from_4.x_to_5.0[Upgrade from {pve} 4 to 5]
+
+* https://pve.proxmox.com/wiki/Upgrade_from_3.x_to_4.0[Upgrade from {pve} 3 to 4]
+
+LXC vs LXD vs Proxmox Containers vs Docker::
+
+LXC is a userspace interface for the Linux kernel containment
+features. Through a powerful API and simple tools, it lets Linux users
+easily create and manage system containers. LXC, as well as the former
+OpenVZ, aims at *system virtualization*. Thus, it allows you to run a
+complete OS inside a container, where you log in using ssh, add users,
+run apache, etc...
++
+LXD is built on top of LXC to provide a new, better user
+experience. Under the hood, LXD uses LXC through `liblxc` and its Go
+binding to create and manage the containers. It's basically an
+alternative to LXC's tools and distribution template system with the
+added features that come from being controllable over the network.
++
+Proxmox Containers are how we refer to containers that are created and managed
+using the Proxmox Container Toolkit (`pct`). They also target *system
+virtualization* and use LXC as the basis of the container offering. With the
+addition of OCI image support (technology preview), Proxmox VE can also create
+containers from OCI images, including full system containers but also
+application containers (tech preview).
+The Proxmox Container Toolkit (`pct`) is tightly coupled with {pve}. This means
+that it is aware of cluster setups, and it can use the same network and storage
+resources as QEMU virtual machines (VMs). You can even use the {pve} firewall,
+create and restore backups, or manage containers using the HA framework.
+Everything can be controlled over the network using the {pve} API.
++
+Docker aims at running a *single* application in an isolated, self-contained
+environment. These are generally referred to as ``Application Containers'', rather
+than ``System Containers''. You manage a Docker instance from the host, using the
+Docker Engine command-line interface. It is not recommended to run docker
+directly on your {pve} host.
++
+NOTE: While it can be convenient to run ``Application Containers'' directly as
+Proxmox Containers, doing so is currently a tech preview. For use cases
+requiring container orchestration or live migration, it is still recommended to
+run them inside a Proxmox QEMU virtual machine.

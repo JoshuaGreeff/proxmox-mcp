@@ -1,0 +1,1499 @@
+[[chapter_pveceph]]
+ifdef::manvolnum[]
+pveceph(1)
+==========
+:pve-toplevel:
+
+NAME
+----
+
+pveceph - Manage Ceph Services on Proxmox VE Nodes
+
+SYNOPSIS
+--------
+
+include::generated/pveceph.1-synopsis.adoc[]
+
+DESCRIPTION
+-----------
+endif::manvolnum[]
+ifndef::manvolnum[]
+Deploy Hyper-Converged Ceph Cluster
+===================================
+:pve-toplevel:
+
+Introduction
+------------
+endif::manvolnum[]
+
+[thumbnail="screenshot/gui-ceph-status-dashboard.png"]
+
+{pve} unifies your compute and storage systems, that is, you can use the same
+physical nodes within a cluster for both computing (processing VMs and
+containers) and replicated storage. The traditional silos of compute and
+storage resources can be wrapped up into a single hyper-converged appliance.
+Separate storage networks (SANs) and connections via network attached storage
+(NAS) disappear. With the integration of Ceph, an open source software-defined
+storage platform, {pve} has the ability to run and manage Ceph storage directly
+on the hypervisor nodes.
+
+Ceph is a distributed object store and file system designed to provide
+excellent performance, reliability and scalability.
+
+.Some advantages of Ceph on {pve} are:
+- Easy setup and management via CLI and GUI
+- Thin provisioning
+- Snapshot support
+- Self healing
+- Scalable to the exabyte level
+- Provides block, file system, and object storage
+- Setup pools with different performance and redundancy characteristics
+- Data is replicated, making it fault tolerant
+- Runs on commodity hardware
+- No need for hardware RAID controllers
+- Open source
+
+For small to medium-sized deployments, it is possible to install a Ceph server
+for using RADOS Block Devices (RBD) or CephFS directly on your {pve} cluster
+nodes (see xref:ceph_rados_block_devices[Ceph RADOS Block Devices (RBD)]).
+Recent hardware has a lot of CPU power and RAM, so running storage services and
+virtual guests on the same node is possible.
+
+To simplify management, {pve} provides you native integration to install and
+manage {ceph} services on {pve} nodes either via the built-in web interface, or
+using the 'pveceph' command line tool.
+
+
+Terminology
+-----------
+
+// TODO: extend and also describe basic architecture here.
+.Ceph consists of multiple Daemons, for use as an RBD storage:
+- Ceph Monitor (ceph-mon, or MON)
+- Ceph Manager (ceph-mgr, or MGS)
+- Ceph Metadata Service (ceph-mds, or MDS)
+- Ceph Object Storage Daemon (ceph-osd, or OSD)
+
+TIP: We highly recommend to get familiar with Ceph
+footnote:[Ceph intro {cephdocs-url}/start/],
+its architecture
+footnote:[Ceph architecture {cephdocs-url}/architecture/]
+and vocabulary
+footnote:[Ceph glossary {cephdocs-url}/glossary].
+
+
+[[_recommendations_for_a_healthy_ceph_cluster]]
+Recommendations for a Healthy Ceph Cluster
+------------------------------------------
+
+To build a hyper-converged Proxmox + Ceph Cluster, you must use at least three
+(preferably) identical servers for the setup.
+
+Check also the recommendations from
+{cephdocs-url}/start/hardware-recommendations/[Ceph's website].
+
+NOTE: The recommendations below should be seen as a rough guidance for choosing
+hardware. Therefore, it is still essential to adapt it to your specific needs.
+You should test your setup and monitor health and performance continuously.
+
+[[pve_ceph_recommendation_cpu]]
+.CPU
+Ceph services can be classified into two categories:
+
+* Intensive CPU usage, benefiting from high CPU base frequencies and multiple
+  cores. Members of that category are:
+** Object Storage Daemon (OSD) services
+** Meta Data Service (MDS) used for CephFS
+* Moderate CPU usage, not needing multiple CPU cores. These are:
+** Monitor (MON) services
+** Manager (MGR) services
+
+As a simple rule of thumb, you should assign at least one CPU core (or thread)
+to each Ceph service to provide the minimum resources required for stable and
+durable Ceph performance.
+
+For example, if you plan to run a Ceph monitor, a Ceph manager and 6 Ceph OSDs
+services on a node you should reserve 8 CPU cores purely for Ceph when targeting
+basic and stable performance.
+
+Note that OSDs CPU usage depend mostly from the disks performance. The higher
+the possible IOPS (**IO** **O**perations per **S**econd) of a disk, the more CPU
+can be utilized by a OSD service.
+For modern enterprise SSD disks, like NVMe's that can permanently sustain a high
+IOPS load over 100'000 with sub millisecond latency, each OSD can use multiple
+CPU threads, e.g., four to six CPU threads utilized per NVMe backed OSD is
+likely for very high performance disks.
+
+[[pve_ceph_recommendation_memory]]
+.Memory
+Especially in a hyper-converged setup, the memory consumption needs to be
+carefully planned out and monitored. In addition to the predicted memory usage
+of virtual machines and containers, you must also account for having enough
+memory available for Ceph to provide excellent and stable performance.
+
+While usage may be less under normal conditions, it will consume more memory
+during critical operations, such as recovery, rebalancing, or backfilling. That
+means you should avoid maxing out your available memory already on regular
+operation, but rather leave some headroom to cope with outages.
+
+The current recommendation is to xref:pve_ceph_configuration[configure] OSDs
+with at least **8 GiB of memory** for good performance. The OSD daemon requires
+4 GiB by default.
+
+NOTE: Total memory consumption is primarily determined by the number of OSD
+daemons. However, for critical operations, all Ceph services may require
+additional memory.
+
+[[pve_ceph_recommendation_network]]
+.Network
+We recommend a network bandwidth of at least 10 Gbps, or more, to be used
+exclusively for Ceph traffic. A meshed network setup
+footnote:[Full Mesh Network for Ceph {webwiki-url}Full_Mesh_Network_for_Ceph_Server]
+is also an option for three to five node clusters, if there are no 10+ Gbps
+switches available.
+
+[IMPORTANT]
+The volume of traffic, especially during recovery, will interfere
+with other services on the same network, especially the latency sensitive {pve}
+corosync cluster stack can be affected, resulting in possible loss of cluster
+quorum.  Moving the Ceph traffic to dedicated and physical separated networks
+will avoid such interference, not only for corosync, but also for the networking
+services provided by any virtual guests.
+
+For estimating your bandwidth needs, you need to take the performance of your
+disks into account.. While a single HDD might not saturate a 1 Gb link, multiple
+HDD OSDs per node can already saturate 10 Gbps too.
+If modern NVMe-attached SSDs are used, a single one can already saturate 10 Gbps
+of bandwidth, or more. For such high-performance setups we recommend at least
+a 25 Gpbs, while even 40 Gbps or 100+ Gbps might be required to utilize the full
+performance potential of the underlying disks.
+
+If unsure, we recommend using three (physical) separate networks for
+high-performance setups:
+
+* one very high bandwidth (25+ Gbps) network for Ceph (internal) cluster
+  traffic.
+* one high bandwidth (10+ Gpbs) network for Ceph (public) traffic between the
+  ceph server and ceph client storage traffic. Depending on your needs this can
+  also be used to host the virtual guest traffic and the VM live-migration
+  traffic.
+* one medium bandwidth (1 Gbps) exclusive for the latency sensitive corosync
+  cluster communication.
+
+[[pve_ceph_recommendation_disk]]
+.Disks
+When planning the size of your Ceph cluster, it is important to take the
+recovery time into consideration. Especially with small clusters, recovery
+might take long. It is recommended that you use SSDs instead of HDDs in small
+setups to reduce recovery time, minimizing the likelihood of a subsequent
+failure event during recovery.
+
+In general, SSDs will provide more IOPS than spinning disks. With this in mind,
+in addition to the higher cost, it may make sense to implement a
+xref:pve_ceph_device_classes[class based] separation of pools. Another way to
+speed up OSDs is to use a faster disk as a journal or
+DB/**W**rite-**A**head-**L**og device, see
+xref:pve_ceph_osds[creating Ceph OSDs].
+If a faster disk is used for multiple OSDs, a proper balance between OSD
+and WAL / DB (or journal) disk must be selected, otherwise the faster disk
+becomes the bottleneck for all linked OSDs.
+
+Aside from the disk type, Ceph performs best with an evenly sized, and an evenly
+distributed amount of disks per node. For example, 4 x 500 GB disks within each
+node is better than a mixed setup with a single 1 TB and three 250 GB disk.
+
+You also need to balance OSD count and single OSD capacity. More capacity
+allows you to increase storage density, but it also means that a single OSD
+failure forces Ceph to recover more data at once.
+
+[[pve_ceph_recommendation_raid]]
+.Avoid RAID
+As Ceph handles data object redundancy and multiple parallel writes to disks
+(OSDs) on its own, using a RAID controller normally doesn’t improve
+performance or availability. On the contrary, Ceph is designed to handle whole
+disks on it's own, without any abstraction in between. RAID controllers are not
+designed for the Ceph workload and may complicate things and sometimes even
+reduce performance, as their write and caching algorithms may interfere with
+the ones from Ceph.
+
+WARNING: Avoid RAID controllers. Use host bus adapter (HBA) instead.
+
+[[pve_ceph_install_wizard]]
+Initial Ceph Installation & Configuration
+-----------------------------------------
+
+Using the Web-based Wizard
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[thumbnail="screenshot/gui-node-ceph-install.png"]
+
+With {pve} you have the benefit of an easy to use installation wizard
+for Ceph. Click on one of your cluster nodes and navigate to the Ceph
+section in the menu tree. If Ceph is not already installed, you will see a
+prompt offering to do so.
+
+The wizard is divided into multiple sections, where each needs to
+finish successfully, in order to use Ceph.
+
+First you need to chose which Ceph version you want to install. Prefer the one
+from your other nodes, or the newest if this is the first node you install
+Ceph.
+
+After starting the installation, the wizard will download and install all the
+required packages from {pve}'s Ceph repository.
+[thumbnail="screenshot/gui-node-ceph-install-wizard-step0.png"]
+
+After finishing the installation step, you will need to create a configuration.
+This step is only needed once per cluster, as this configuration is distributed
+automatically to all remaining cluster members through {pve}'s clustered
+xref:chapter_pmxcfs[configuration file system (pmxcfs)].
+
+The configuration step includes the following settings:
+
+[[pve_ceph_wizard_networks]]
+
+* *Public Network:* This network will be used for public storage communication
+  (e.g., for virtual machines using a Ceph RBD backed disk, or a CephFS mount),
+  and communication between the different Ceph services. This setting is
+  required.
+  +
+  Separating your Ceph traffic from the {pve} cluster communication (corosync),
+  and possibly the front-facing (public) networks of your virtual guests, is
+  highly recommended. Otherwise, Ceph's high-bandwidth IO-traffic could cause
+  interference with other low-latency dependent services.
+
+[thumbnail="screenshot/gui-node-ceph-install-wizard-step2.png"]
+
+* *Cluster Network:* Specify to separate the xref:pve_ceph_osds[OSD] replication
+  and heartbeat traffic as well. This setting is optional.
+  +
+  Using a physically separated network is recommended, as it will relieve the
+  Ceph public and the virtual guests network, while also providing a significant
+  Ceph performance improvements.
+  +
+  The Ceph cluster network can be configured and moved to another physically
+  separated network at a later time.
+
+You have two more options which are considered advanced and therefore should
+only changed if you know what you are doing.
+
+* *Number of replicas*: Defines how often an object is replicated.
+* *Minimum replicas*: Defines the minimum number of required replicas for I/O to
+  be marked as complete.
+
+Additionally, you need to choose your first monitor node. This step is required.
+
+That's it. You should now see a success page as the last step, with further
+instructions on how to proceed. Your system is now ready to start using Ceph.
+To get started, you will need to create some additional xref:pve_ceph_monitors[monitors],
+xref:pve_ceph_osds[OSDs] and at least one xref:pve_ceph_pools[pool].
+
+The rest of this chapter will guide you through getting the most out of
+your {pve} based Ceph setup. This includes the aforementioned tips and
+more, such as xref:pveceph_fs[CephFS], which is a helpful addition to your
+new Ceph cluster.
+
+[[pve_ceph_install]]
+CLI Installation of Ceph Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Alternatively to the the recommended {pve}  Ceph installation wizard available
+in the web interface, you can use the following CLI command on each node:
+
+[source,bash]
+----
+pveceph install
+----
+
+This sets up an `apt` package repository in
+`/etc/apt/sources.list.d/ceph.sources` and installs the required software.
+
+
+Initial Ceph configuration via CLI
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the {pve} Ceph installation wizard (recommended) or run the
+following command on one node:
+
+[source,bash]
+----
+pveceph init --network 10.10.10.0/24
+----
+
+This creates an initial configuration at `/etc/pve/ceph.conf` with a
+dedicated network for Ceph. This file is automatically distributed to
+all {pve} nodes, using xref:chapter_pmxcfs[pmxcfs]. The command also
+creates a symbolic link at `/etc/ceph/ceph.conf`, which points to that file.
+Thus, you can simply run Ceph commands without the need to specify a
+configuration file.
+
+
+[[pve_ceph_monitors]]
+Ceph Monitor
+-----------
+
+[thumbnail="screenshot/gui-ceph-monitor.png"]
+
+The Ceph Monitor (MON)
+footnote:[Ceph Monitor {cephdocs-url}/rados/configuration/mon-config-ref/]
+maintains a master copy of the cluster map. For high availability, you need at
+least 3 monitors. One monitor will already be installed if you
+used the installation wizard. You won't need more than 3 monitors, as long
+as your cluster is small to medium-sized. Only really large clusters will
+require more than this.
+
+[[pveceph_create_mon]]
+Create Monitors
+~~~~~~~~~~~~~~~
+
+On each node where you want to place a monitor (three monitors are recommended),
+create one by using the 'Ceph -> Monitor' tab in the GUI or run:
+
+
+[source,bash]
+----
+pveceph mon create
+----
+
+[[pveceph_destroy_mon]]
+Destroy Monitors
+~~~~~~~~~~~~~~~~
+
+To remove a Ceph Monitor via the GUI, first select a node in the tree view and
+go to the **Ceph -> Monitor** panel. Select the MON and click the **Destroy**
+button.
+
+To remove a Ceph Monitor via the CLI, first connect to the node on which the MON
+is running. Then execute the following command:
+[source,bash]
+----
+pveceph mon destroy
+----
+
+NOTE: At least three Monitors are needed for quorum.
+
+
+[[pve_ceph_manager]]
+Ceph Manager
+------------
+
+The Manager daemon runs alongside the monitors. It provides an interface to
+monitor the cluster. Since the release of Ceph luminous, at least one ceph-mgr
+footnote:[Ceph Manager {cephdocs-url}/mgr/] daemon is
+required.
+
+[[pveceph_create_mgr]]
+Create Manager
+~~~~~~~~~~~~~~
+
+Multiple Managers can be installed, but only one Manager is active at any given
+time.
+
+[source,bash]
+----
+pveceph mgr create
+----
+
+NOTE: It is recommended to install the Ceph Manager on the monitor nodes. For
+high availability install more then one manager.
+
+
+[[pveceph_destroy_mgr]]
+Destroy Manager
+~~~~~~~~~~~~~~~
+
+To remove a Ceph Manager via the GUI, first select a node in the tree view and
+go to the **Ceph -> Monitor** panel. Select the Manager and click the
+**Destroy** button.
+
+To remove a Ceph Monitor via the CLI, first connect to the node on which the
+Manager is running. Then execute the following command:
+[source,bash]
+----
+pveceph mgr destroy
+----
+
+NOTE: While a manager is not a hard-dependency, it is crucial for a Ceph cluster,
+as it handles important features like PG-autoscaling, device health monitoring,
+telemetry and more.
+
+[[pve_ceph_osds]]
+Ceph OSDs
+---------
+
+[thumbnail="screenshot/gui-ceph-osd-status.png"]
+
+Ceph **O**bject **S**torage **D**aemons store objects for Ceph over the
+network. It is recommended to use one OSD per physical disk.
+
+[[pve_ceph_osd_create]]
+Create OSDs
+~~~~~~~~~~~
+
+You can create an OSD either via the {pve} web interface or via the CLI using
+`pveceph`. For example:
+
+[source,bash]
+----
+pveceph osd create /dev/sd[X]
+----
+
+TIP: We recommend a Ceph cluster with at least three nodes and at least 12
+OSDs, evenly distributed among the nodes.
+
+If the disk was in use before (for example, for ZFS or as an OSD) you first need
+to zap all traces of that usage. To remove the partition table, boot sector and
+any other OSD leftover, you can use the following command:
+
+[source,bash]
+----
+ceph-volume lvm zap /dev/sd[X] --destroy
+----
+
+WARNING: The above command will destroy all data on the disk!
+
+.Ceph Bluestore
+
+Starting with the Ceph Kraken release, a new Ceph OSD storage type was
+introduced called Bluestore
+footnote:[Ceph Bluestore https://ceph.com/community/new-luminous-bluestore/].
+This is the default when creating OSDs since Ceph Luminous.
+
+[source,bash]
+----
+pveceph osd create /dev/sd[X]
+----
+
+.Block.db and block.wal
+
+If you want to use a separate DB/WAL device for your OSDs, you can specify it
+through the '-db_dev' and '-wal_dev' options. The WAL is placed with the DB, if
+not specified separately.
+
+[source,bash]
+----
+pveceph osd create /dev/sd[X] -db_dev /dev/sd[Y] -wal_dev /dev/sd[Z]
+----
+
+You can directly choose the size of those with the '-db_size' and '-wal_size'
+parameters respectively. If they are not given, the following values (in order)
+will be used:
+
+* bluestore_block_{db,wal}_size from Ceph configuration...
+** ... database, section 'osd'
+** ... database, section 'global'
+** ... file, section 'osd'
+** ... file, section 'global'
+* 10% (DB)/1% (WAL) of OSD size
+
+NOTE: The DB stores BlueStore’s internal metadata, and the WAL is BlueStore’s
+internal journal or write-ahead log. It is recommended to use a fast SSD or
+NVRAM for better performance.
+
+.Ceph Filestore
+
+Before Ceph Luminous, Filestore was used as the default storage type for Ceph OSDs.
+Starting with Ceph Nautilus, {pve} does not support creating such OSDs with
+'pveceph' anymore. If you still want to create filestore OSDs, use
+'ceph-volume' directly.
+
+[source,bash]
+----
+ceph-volume lvm create --filestore --data /dev/sd[X] --journal /dev/sd[Y]
+----
+
+[[pve_ceph_osd_destroy]]
+Destroy OSDs
+~~~~~~~~~~~~
+
+If you experience problems with an OSD or its disk, try to
+xref:pve_ceph_mon_and_ts[troubleshoot] them first to decide if a
+xref:pve_ceph_osd_replace[replacement] is needed.
+
+To destroy an OSD, navigate to the __<Node> -> Ceph -> OSD__ panel or use the
+mentioned CLI commands on the node where the OSD is located.
+
+. Make sure the cluster has enough space to handle the removal of the OSD.
+In the __Ceph -> OSD__ panel,if the to-be destroyed OSD is still `up` and `in`
+(non-zero value at `AVAIL`), make sure that all OSDs have their `Used (%)`
+value well below the `nearfull_ratio` of default `85%`.
++
+This way you can reduce the risk from the upcoming rebalancing, which may cause
+OSDs to run full and thereby blocking I/O on Ceph pools.
++
+Use the following command to get the same information on the CLI:
++
+[source,bash]
+----
+ceph osd df tree
+----
+
+. If the to-be destroyed OSD is not `out` yet, select the OSD and click on
+**Out**. This will exclude it from data distribution and start a rebalance.
++
+The following command does the same:
++
+[source,bash]
+----
+ceph osd out <id>
+----
+
+. If you can, wait until Ceph has finished the rebalance to always have enough
+replicas. The OSD will be empty; once it is, it will show __0 PGs__.
+
+. Click on **Stop**. If stopping is not safe yet, a warning will
+appear, and you should click on **Cancel**. Try it again in a few moments.
++
+The following commands can be used to check if it is safe to stop and stop
+the OSD:
++
+[source,bash]
+----
+ceph osd ok-to-stop <id>
+pveceph stop --service osd.<id>
+----
+
+. Finally:
++
+To remove the OSD from Ceph and delete all disk data, first click on
+**More -> Destroy**. Enable the cleanup option to clean up the partition table
+and other structures. This makes it possible to immediately reuse the disk in
+{pve}.
+Then, click on **Remove**.
++
+The CLI command to destroy the OSD is:
++
+[source,bash]
+----
+pveceph osd destroy <id> [--cleanup]
+----
+
+[[pve_ceph_configuration]]
+Ceph Configuration
+------------------
+
+Ceph daemon and clients pull their configuration from one or more sources
+footnote:[Ceph config sources https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/#config-sources].
+In {PVE}, a minimal ceph.conf file is used to hold bootstrap settings. Most of
+the configuration is held in the central configuration database maintained by
+the MON services.
+
+To persistently change configuration values use the following commands
+footnote:[Ceph MON DB commands https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/#commands]:
+
+[frame="none",grid="none", align="left"]
+|===
+|`ceph config dump`|Show all configuration option(s)
+|`ceph config get <who> <name>`|Show configuration option(s) for an entity
+|`ceph config set <who> <name> <value>`|Set a configuration option for one or more entities
+|`ceph config rm <who> <name>`| Clear a configuration option for one or more entities
+|===
+
+.Example for increasing the osd_memory_target for all OSD daemons
+[source,bash]
+----
+ceph config set osd osd_memory_target 8G
+----
+
+NOTE: If an option exists in a local configuration file, the configuration in
+the MON DB will be ignored because it has a lower precedence.
+
+
+[[pve_ceph_pools]]
+Ceph Pools
+----------
+
+[thumbnail="screenshot/gui-ceph-pools.png"]
+
+A pool is a logical group for storing objects. It holds a collection of objects,
+known as **P**lacement **G**roups (`PG`, `pg_num`).
+
+
+Create and Edit Pools
+~~~~~~~~~~~~~~~~~~~~~
+
+You can create and edit pools from the command line or the web interface of any
+{pve} host under **Ceph -> Pools**.
+
+When no options are given, we set a default of **128 PGs**, a **size of 3
+replicas** and a **min_size of 2 replicas**, to ensure no data loss occurs if
+any OSD fails.
+
+WARNING: **Do not set a min_size of 1**. A replicated pool with min_size of 1
+allows I/O on an object when it has only 1 replica, which could lead to data
+loss, incomplete PGs or unfound objects.
+
+It is advised that you either enable the PG-Autoscaler or calculate the PG
+number based on your setup. You can find the formula and the PG calculator
+footnote:[PG calculator https://web.archive.org/web/20210301111112/http://ceph.com/pgcalc/] online. From Ceph Nautilus
+onward, you can change the number of PGs
+footnoteref:[placement_groups,Placement Groups
+{cephdocs-url}/rados/operations/placement-groups/] after the setup.
+
+The PG autoscaler footnoteref:[autoscaler,Automated Scaling
+{cephdocs-url}/rados/operations/placement-groups/#automated-scaling] can
+automatically scale the PG count for a pool in the background. Setting the
+`Target Size` or `Target Ratio` advanced parameters helps the PG-Autoscaler to
+make better decisions.
+
+.Example for creating a pool over the CLI
+[source,bash]
+----
+pveceph pool create <pool-name> --add_storages
+----
+
+TIP: If you would also like to automatically define a storage for your
+pool, keep the `Add as Storage' checkbox checked in the web interface, or use the
+command-line option '--add_storages' at pool creation.
+
+Pool Options
+^^^^^^^^^^^^
+
+[thumbnail="screenshot/gui-ceph-pool-create.png"]
+
+The following options are available on pool creation, and partially also when
+editing a pool.
+
+Name:: The name of the pool. This must be unique and can't be changed afterwards.
+Size:: The number of replicas per object. Ceph always tries to have this many
+copies of an object. Default: `3`.
+PG Autoscale Mode:: The automatic PG scaling mode footnoteref:[autoscaler] of
+the pool. If set to `warn`, it produces a warning message when a pool
+has a non-optimal PG count. Default: `warn`.
+Add as Storage:: Configure a VM or container storage using the new pool.
+Default: `true` (only visible on creation).
+
+.Advanced Options
+Min. Size:: The minimum number of replicas per object. Ceph will reject I/O on
+the pool if a PG has less than this many replicas. Default: `2`.
+Crush Rule:: The rule to use for mapping object placement in the cluster. These
+rules define how data is placed within the cluster. See
+xref:pve_ceph_device_classes[Ceph CRUSH & device classes] for information on
+device-based rules.
+# of PGs:: The number of placement groups footnoteref:[placement_groups] that
+the pool should have at the beginning. Default: `128`.
+Target Ratio:: The ratio of data that is expected in the pool. The PG
+autoscaler uses the ratio relative to other ratio sets. It takes precedence
+over the `target size` if both are set.
+Target Size:: The estimated amount of data expected in the pool. The PG
+autoscaler uses this size to estimate the optimal PG count.
+Min. # of PGs:: The minimum number of placement groups. This setting is used to
+fine-tune the lower bound of the PG count for that pool. The PG autoscaler
+will not merge PGs below this threshold.
+
+Further information on Ceph pool handling can be found in the Ceph pool
+operation footnote:[Ceph pool operation
+{cephdocs-url}/rados/operations/pools/]
+manual.
+
+
+[[pve_ceph_ec_pools]]
+Erasure Coded Pools
+~~~~~~~~~~~~~~~~~~~
+
+Erasure coding (EC) is a form of `forward error correction' codes that allows
+to recover from a certain amount of data loss. Erasure coded pools can offer
+more usable space compared to replicated pools, but they do that for the price
+of performance.
+
+For comparison: in classic, replicated pools, multiple replicas of the data
+are stored (`size`) while in erasure coded pool, data is split into `k` data
+chunks with additional `m` coding (checking) chunks. Those coding chunks can be
+used to recreate data should data chunks be missing.
+
+The number of coding chunks, `m`, defines how many OSDs can be lost without
+losing any data. The total amount of objects stored is `k + m`.
+
+Creating EC Pools
+^^^^^^^^^^^^^^^^^
+
+Erasure coded (EC) pools can be created with the `pveceph` CLI tooling.
+Planning an EC pool needs to account for the fact, that they work differently
+than replicated pools.
+
+The default `min_size` of an EC pool depends on the `m` parameter. If `m = 1`,
+the `min_size` of the EC pool will be `k`. The `min_size` will be `k + 1` if
+`m > 1`. The Ceph documentation recommends a conservative `min_size` of `k + 2`
+footnote:[Ceph Erasure Coded Pool Recovery
+{cephdocs-url}/rados/operations/erasure-code/#erasure-coded-pool-recovery].
+
+If there are less than `min_size` OSDs available, any IO to the pool will be
+blocked until there are enough OSDs available again.
+
+NOTE: When planning an erasure coded pool, keep an eye on the `min_size` as it
+defines how many OSDs need to be available. Otherwise, IO will be blocked.
+
+For example, an EC pool with `k = 2` and `m = 1` will have `size = 3`,
+`min_size = 2` and will stay operational if one OSD fails. If the pool is
+configured with `k = 2`, `m = 2`, it will have a `size = 4` and `min_size = 3`
+and stay operational if one OSD is lost.
+
+To create a new EC pool, run the following command:
+
+[source,bash]
+----
+pveceph pool create <pool-name> --erasure-coding k=2,m=1
+----
+
+Optional parameters are `failure-domain` and `device-class`. If you
+need to change any EC profile settings used by the pool, you will have to
+create a new pool with a new profile.
+
+This will create a new EC pool plus the needed replicated pool to store the RBD
+omap and other metadata. In the end, there will be a `<pool name>-data` and
+`<pool name>-metadata` pool. The default behavior is to create a matching storage
+configuration as well. If that behavior is not wanted, you can disable it by
+providing the `--add_storages 0` parameter.  When configuring the storage
+configuration manually, keep in mind that the `data-pool` parameter needs to be
+set. Only then will the EC pool be used to store the data objects. For example:
+
+NOTE: The optional parameters `--size`, `--min_size` and `--crush_rule` will be
+used for the replicated metadata pool, but not for the erasure coded data pool.
+If you need to change the `min_size` on the data pool, you can do it later.
+The `size` and `crush_rule` parameters cannot be changed on erasure coded
+pools.
+
+If there is a need to further customize the EC profile, you can do so by
+creating it with the Ceph tools directly footnote:[Ceph Erasure Code Profile
+{cephdocs-url}/rados/operations/erasure-code/#erasure-code-profiles], and
+specify the profile to use with the `profile` parameter.
+
+For example:
+[source,bash]
+----
+pveceph pool create <pool-name> --erasure-coding profile=<profile-name>
+----
+
+Adding EC Pools as Storage
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can add an already existing EC pool as storage to {pve}. It works the same
+way as adding an `RBD` pool but requires the extra `data-pool` option.
+
+[source,bash]
+----
+pvesm add rbd <storage-name> --pool <replicated-pool> --data-pool <ec-pool>
+----
+
+TIP: Do not forget to add the `keyring` and `monhost` option for any external
+Ceph clusters, not managed by the local {pve} cluster.
+
+Destroy Pools
+~~~~~~~~~~~~~
+
+To destroy a pool via the GUI, select a node in the tree view and go to the
+**Ceph -> Pools** panel. Select the pool to destroy and click the **Destroy**
+button. To confirm the destruction of the pool, you need to enter the pool name.
+
+Run the following command to destroy a pool. Specify the '-remove_storages' to
+also remove the associated storage.
+
+[source,bash]
+----
+pveceph pool destroy <name>
+----
+
+NOTE: Pool deletion runs in the background and can take some time.
+You will notice the data usage in the cluster decreasing throughout this
+process.
+
+
+PG Autoscaler
+~~~~~~~~~~~~~
+
+The PG autoscaler allows the cluster to consider the amount of (expected) data
+stored in each pool and to choose the appropriate pg_num values automatically.
+It is available since Ceph Nautilus.
+
+You may need to activate the PG autoscaler module before adjustments can take
+effect.
+
+[source,bash]
+----
+ceph mgr module enable pg_autoscaler
+----
+
+The autoscaler is configured on a per pool basis and has the following modes:
+
+[horizontal]
+warn:: A health warning is issued if the suggested `pg_num` value differs too
+much from the current value.
+on:: The `pg_num` is adjusted automatically with no need for any manual
+interaction.
+off:: No automatic `pg_num` adjustments are made, and no warning will be issued
+if the PG count is not optimal.
+
+The scaling factor can be adjusted to facilitate future data storage with the
+`target_size`, `target_size_ratio` and the `pg_num_min` options.
+
+WARNING: By default, the autoscaler considers tuning the PG count of a pool if
+it is off by a factor of 3. This will lead to a considerable shift in data
+placement and might introduce a high load on the cluster.
+
+You can find a more in-depth introduction to the PG autoscaler on Ceph's Blog -
+https://ceph.io/rados/new-in-nautilus-pg-merging-and-autotuning/[New in
+Nautilus: PG merging and autotuning].
+
+
+[[pve_ceph_device_classes]]
+Ceph CRUSH & Device Classes
+---------------------------
+
+[thumbnail="screenshot/gui-ceph-config.png"]
+
+The footnote:[https://ceph.com/assets/pdfs/weil-crush-sc06.pdf] (**C**ontrolled
+**R**eplication **U**nder **S**calable **H**ashing) algorithm is at the
+foundation of Ceph.
+
+CRUSH calculates where to store and retrieve data from. This has the
+advantage that no central indexing service is needed. CRUSH works using a map of
+OSDs, buckets (device locations) and rulesets (data replication) for pools.
+
+NOTE: Further information can be found in the Ceph documentation, under the
+section CRUSH map footnote:[CRUSH map {cephdocs-url}/rados/operations/crush-map/].
+
+This map can be altered to reflect different replication hierarchies. The object
+replicas can be separated (e.g., failure domains), while maintaining the desired
+distribution.
+
+A common configuration is to use different classes of disks for different Ceph
+pools.  For this reason, Ceph introduced device classes with luminous, to
+accommodate the need for easy ruleset generation.
+
+The device classes can be seen in the 'ceph osd tree' output. These classes
+represent their own root bucket, which can be seen with the below command.
+
+[source,bash]
+----
+ceph osd crush tree --show-shadow
+----
+
+Example output form the above command:
+
+[source,bash]
+----
+ID  CLASS WEIGHT  TYPE NAME
+-16  nvme 2.18307 root default~nvme
+-13  nvme 0.72769     host sumi1~nvme
+ 12  nvme 0.72769         osd.12
+-14  nvme 0.72769     host sumi2~nvme
+ 13  nvme 0.72769         osd.13
+-15  nvme 0.72769     host sumi3~nvme
+ 14  nvme 0.72769         osd.14
+ -1       7.70544 root default
+ -3       2.56848     host sumi1
+ 12  nvme 0.72769         osd.12
+ -5       2.56848     host sumi2
+ 13  nvme 0.72769         osd.13
+ -7       2.56848     host sumi3
+ 14  nvme 0.72769         osd.14
+----
+
+To instruct a pool to only distribute objects on a specific device class, you
+first need to create a ruleset for the device class:
+
+[source,bash]
+----
+ceph osd crush rule create-replicated <rule-name> <root> <failure-domain> <class>
+----
+
+[frame="none",grid="none", align="left", cols="30%,70%"]
+|===
+|<rule-name>|name of the rule, to connect with a pool (seen in GUI & CLI)
+|<root>|which crush root it should belong to (default Ceph root "default")
+|<failure-domain>|at which failure-domain the objects should be distributed (usually host)
+|<class>|what type of OSD backing store to use (e.g., nvme, ssd, hdd)
+|===
+
+Once the rule is in the CRUSH map, you can tell a pool to use the ruleset.
+
+[source,bash]
+----
+ceph osd pool set <pool-name> crush_rule <rule-name>
+----
+
+TIP: If the pool already contains objects, these must be moved accordingly.
+Depending on your setup, this may introduce a big performance impact on your
+cluster. As an alternative, you can create a new pool and move disks separately.
+
+
+Ceph Client
+-----------
+
+[thumbnail="screenshot/gui-ceph-log.png"]
+
+Following the setup from the previous sections, you can configure {pve} to use
+such pools to store VM and Container images. Simply use the GUI to add a new
+`RBD` storage (see section
+xref:ceph_rados_block_devices[Ceph RADOS Block Devices (RBD)]).
+
+You also need to copy the keyring to a predefined location for an external Ceph
+cluster. If Ceph is installed on the Proxmox nodes itself, then this will be
+done automatically.
+
+NOTE: The filename needs to be `<storage_id> + `.keyring`, where `<storage_id>` is
+the expression after 'rbd:' in `/etc/pve/storage.cfg`. In the following example,
+`my-ceph-storage` is the `<storage_id>`:
+
+[source,bash]
+----
+mkdir /etc/pve/priv/ceph
+cp /etc/ceph/ceph.client.admin.keyring /etc/pve/priv/ceph/my-ceph-storage.keyring
+----
+
+[[pveceph_fs]]
+CephFS
+------
+
+Ceph also provides a filesystem, which runs on top of the same object storage as
+RADOS block devices do. A **M**eta**d**ata **S**erver (`MDS`) is used to map the
+RADOS backed objects to files and directories, allowing Ceph to provide a
+POSIX-compliant, replicated filesystem. This allows you to easily configure a
+clustered, highly available, shared filesystem. Ceph's Metadata Servers
+guarantee that files are evenly distributed over the entire Ceph cluster. As a
+result, even cases of high load will not overwhelm a single host, which can be
+an issue with traditional shared filesystem approaches, for example `NFS`.
+
+[thumbnail="screenshot/gui-node-ceph-cephfs-panel.png"]
+
+{pve} supports both creating a hyper-converged CephFS and using an existing
+xref:storage_cephfs[CephFS as storage] to save backups, ISO files, and container
+templates.
+
+
+[[pveceph_fs_mds]]
+Metadata Server (MDS)
+~~~~~~~~~~~~~~~~~~~~~
+
+CephFS needs at least one Metadata Server to be configured and running, in order
+to function. You can create an MDS through the {pve} web GUI's `Node
+-> CephFS` panel or from the command line with:
+
+[source,bash]
+----
+pveceph mds create
+----
+
+Multiple metadata servers can be created in a cluster, but with the default
+settings, only one can be active at a time. If an MDS or its node becomes
+unresponsive (or crashes), another `standby` MDS will get promoted to `active`.
+You can speed up the handover between the active and standby MDS by using
+the 'hotstandby' parameter option on creation, or if you have already created it
+you may set/add:
+
+[source,bash]
+----
+mds standby replay = true
+----
+
+in the respective MDS section of `/etc/pve/ceph.conf`. With this enabled, the
+specified MDS will remain in a `warm` state, polling the active one, so that it
+can take over faster in case of any issues.
+
+NOTE: This active polling will have an additional performance impact on your
+system and the active `MDS`.
+
+.Multiple Active MDS
+
+Since Luminous (12.2.x) you can have multiple active metadata servers
+running at once, but this is normally only useful if you have a high amount of
+clients running in parallel. Otherwise the `MDS` is rarely the bottleneck in a
+system. If you want to set this up, please refer to the Ceph documentation.
+footnote:[Configuring multiple active MDS daemons
+{cephdocs-url}/cephfs/multimds/]
+
+[[pveceph_fs_create]]
+Create CephFS
+~~~~~~~~~~~~~
+
+With {pve}'s integration of CephFS, you can easily create a CephFS using the
+web interface, CLI or an external API interface. Some prerequisites are required
+for this to work:
+
+.Prerequisites for a successful CephFS setup:
+- xref:pve_ceph_install[Install Ceph packages] - if this was already done some
+time ago, you may want to rerun it on an up-to-date system to
+ensure that all CephFS related packages get installed.
+- xref:pve_ceph_monitors[Setup Monitors]
+- xref:pve_ceph_monitors[Setup your OSDs]
+- xref:pveceph_fs_mds[Setup at least one MDS]
+
+After this is complete, you can simply create a CephFS through
+either the Web GUI's `Node -> CephFS` panel or the command-line tool `pveceph`,
+for example:
+
+[source,bash]
+----
+pveceph fs create --pg_num 128 --add-storage
+----
+
+This creates a CephFS named 'cephfs', using a pool for its data named
+'cephfs_data' with '128' placement groups and a pool for its metadata named
+'cephfs_metadata' with one quarter of the data pool's placement groups (`32`).
+Check the xref:pve_ceph_pools[{pve} managed Ceph pool chapter] or visit the
+Ceph documentation for more information regarding an appropriate placement group
+number (`pg_num`) for your setup footnoteref:[placement_groups].
+Additionally, the '--add-storage' parameter will add the CephFS to the {pve}
+storage configuration after it has been created successfully.
+
+Destroy CephFS
+~~~~~~~~~~~~~~
+
+WARNING: Destroying a CephFS will render all of its data unusable. This cannot be
+undone!
+
+To completely and gracefully remove a CephFS, the following steps are
+necessary:
+
+* Disconnect every non-{PVE} client (e.g. unmount the CephFS in guests).
+* Disable all related CephFS {PVE} storage entries (to prevent it from being
+  automatically mounted).
+* Remove all used resources from guests (e.g. ISOs) that are on the CephFS you
+  want to destroy.
+* Unmount the CephFS storages on all cluster nodes manually with
++
+[source,bash]
+----
+umount /mnt/pve/<STORAGE-NAME>
+----
++
+Where `<STORAGE-NAME>` is the name of the CephFS storage in your {PVE}.
+
+* Now make sure that no metadata server (`MDS`) is running for that CephFS,
+  either by stopping or destroying them. This can be done through the web
+  interface or via the command-line interface, for the latter you would issue
+  the following command:
++
+[source,bash]
+----
+pveceph stop --service mds.NAME
+----
++
+to stop them, or
++
+[source,bash]
+----
+pveceph mds destroy NAME
+----
++
+to destroy them.
++
+Note that standby servers will automatically be promoted to active when an
+active `MDS` is stopped or removed, so it is best to first stop all standby
+servers.
+
+* Now you can destroy the CephFS with
++
+[source,bash]
+----
+pveceph fs destroy NAME --remove-storages --remove-pools
+----
++
+This will automatically destroy the underlying Ceph pools as well as remove
+the storages from pve config.
+
+After these steps, the CephFS should be completely removed and if you have
+other CephFS instances, the stopped metadata servers can be started again
+to act as standbys.
+
+Ceph Maintenance
+----------------
+
+[[pve_ceph_osd_replace]]
+Replace OSDs
+~~~~~~~~~~~~
+
+With the following steps you can replace the disk of an OSD, which is
+one of the most common maintenance tasks in Ceph. If there is a
+problem with an OSD while its disk still seems to be healthy, read the
+xref:pve_ceph_mon_and_ts[troubleshooting] section first.
+
+. If the disk failed, get a
+xref:pve_ceph_recommendation_disk[recommended] replacement disk of the
+same type and size.
+
+. xref:pve_ceph_osd_destroy[Destroy] the OSD in question.
+
+. Detach the old disk from the server and attach the new one.
+
+. xref:pve_ceph_osd_create[Create] the OSD again.
+
+. After automatic rebalancing, the cluster status should switch back
+to `HEALTH_OK`. Any still listed crashes can be acknowledged by
+running the following command:
+[source,bash]
+----
+ceph crash archive-all
+----
+
+Trim/Discard
+~~~~~~~~~~~~
+
+It is good practice to run 'fstrim' (discard) regularly on VMs and containers.
+This releases data blocks that the filesystem isn’t using anymore. It reduces
+data usage and resource load. Most modern operating systems issue such discard
+commands to their disks regularly. You only need to ensure that the Virtual
+Machines enable the xref:qm_hard_disk_discard[disk discard option].
+
+[[pveceph_scrub]]
+Scrub & Deep Scrub
+~~~~~~~~~~~~~~~~~~
+
+Ceph ensures data integrity by 'scrubbing' placement groups. Ceph checks every
+object in a PG for its health. There are two forms of Scrubbing, daily
+cheap metadata checks and weekly deep data checks. The weekly deep scrub reads
+the objects and uses checksums to ensure data integrity. If a running scrub
+interferes with business (performance) needs, you can adjust the time when
+scrubs footnote:[Ceph scrubbing {cephdocs-url}/rados/configuration/osd-config-ref/#scrubbing]
+are executed.
+
+
+[[pveceph_shutdown]]
+Shutdown {pve} + Ceph HCI Cluster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To shut down the whole {pve} + Ceph cluster, first stop all Ceph clients. These
+will mainly be VMs and containers. If you have additional clients that might
+access a Ceph FS or an installed RADOS GW, stop these as well.
+Highly available guests will switch their state to 'stopped' when powered down
+via the {pve} tooling.
+
+Once all clients, VMs and containers are off or not accessing the Ceph cluster
+anymore, verify that the Ceph cluster is in a healthy state. Either via the Web UI
+or the CLI:
+
+[source,bash]
+----
+ceph -s
+----
+
+In order to not cause any recovery during the shut down and later power on
+phases, enable the 'noout' OSD flag. Either in the **Ceph -> OSD** panel behind
+the **Manage Global Flags** button or the CLI:
+
+[source,bash]
+----
+ceph osd set noout
+----
+
+Start powering down your nodes without a monitor (MON). After these nodes are
+down, continue by shutting down nodes with monitors on them.
+
+When powering on the cluster, start the nodes with monitors (MONs) first. Once
+all nodes are up and running, confirm that all Ceph services are up and running.
+In the end, the only warning you should see for Ceph is that the 'noout' flag
+is still set. You can disable it via the web UI or via the CLI:
+
+[source,bash]
+----
+ceph osd unset noout
+----
+
+You can now start up the guests. Highly available guests will change their state
+to 'started' when they power on.
+
+
+[[pveceph_network_change]]
+Network Changes
+~~~~~~~~~~~~~~~
+
+It is possible to change the networks used by Ceph in a HCI setup without any
+downtime if *both the old and new networks can be configured at the same time*.
+
+The procedure differs depending on which network you want to change.
+
+NOTE: A word of caution! It is critical that the change of the used networks by
+Ceph is being done carefully. Otherwise it could lead to a broken Ceph cluster
+with downtime to get it back into a working state! We recommend doing a trial
+run of the procedure in a (virtual) test cluster before changing the production
+infrastructure.
+
+After the new network has been configured on all hosts, make sure you test it
+before proceeding with the changes. One way is to ping all hosts on the new
+network. If you use a large MTU, make sure to also test that it works. For
+example by sending ping packets that will result in a final packet at the max
+MTU size.
+
+To test an MTU of 9000, you will need the following packet sizes:
+
+NOTE: We assume a simple network configuration. In more complicated setups, you
+might need to configure a lower MTU to account for any headers that might be
+added once a packet leaves the host.
+
+[horizontal]
+IPv4:: The overhead of IP and ICMP is '28' bytes; the resulting packet size for
+the ping then is '8972' bytes.
+IPv6:: The overhead is '48' bytes and the resulting packet size is
+'8952' bytes.
+
+The resulting ping command will look like this for an IPv4:
+[source,bash]
+----
+ping -M do -s 8972 {target IP}
+----
+
+When you are switching between IPv4 and IPv6 networks, you need to make sure
+that the following options in the `ceph.conf` file are correctly set to `true`
+or `false`. These config options configure if Ceph services should bind to IPv4
+or IPv6 addresses.
+----
+ms_bind_ipv4 = true
+ms_bind_ipv6 = false
+----
+
+[[pveceph_network_change_public]]
+Change the Ceph Public Network
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Ceph Public network is the main communication channel in a Ceph cluster
+between the different services and clients (for example, a VM). Changing it to
+a different network is not as simple as changing the Ceph Cluster network. The
+main reason is that besides the configuration in the `ceph.conf` file, the Ceph
+MONs (monitors) have an internal configuration where they keep track of all the
+other MONs that are part of the cluster, the 'monmap'.
+
+Therefore, the procedure to change the Ceph Public network is a bit more
+involved:
+
+1. Change `public_network` in the `/etc/pve/ceph.conf` file (do not change any
+other value)
+2. Restart non MON services: OSDs, MGRs and MDS on one host
+3. Wait until Ceph is back to 'HEALTH_OK'
+4. Verify services are using the new network
+5. Continue restarting services on the next host
+6. Destroy one MON
+7. Recreate MON
+8. Wait until Ceph is back to 'HEALTH_OK'
+9. Continue destroying and recreating MONs
+
+You first need to edit the `/etc/pve/ceph.conf` file. Change the
+`public_network` line to match the new subnet.
+
+----
+public_network = 10.9.9.30/24
+----
+
+WARNING: Do not change the `mon_host` line or any `[mon.HOSTNAME]` sections.
+These will be updated automatically when the MONs are destroyed and recreated.
+
+NOTE: Don't worry if the host bits (for example, the last octet) are set by
+default, the netmask in CIDR notation defines the network part.
+
+After you have changed the network, you need to restart the non MON services in
+the cluster for the changes to take effect. Do so one node at a time! To restart all
+non MON services on one node, you can use the following commands on that node.
+Ceph has `systemd` targets for each type of service.
+
+[source,bash]
+----
+systemctl restart ceph-osd.target
+systemctl restart ceph-mgr.target
+systemctl restart ceph-mds.target
+----
+NOTE: You will only have MDS' (Metadata Server) if you use CephFS.
+
+NOTE: After the first OSD service got restarted, the GUI will complain that
+the OSD is not reachable anymore. This is not an issue; VMs can still reach
+them. The reason for the message is that the MGR service cannot reach the OSD
+anymore. The error will vanish after the MGR services get restarted.
+
+WARNING: Do not restart OSDs on multiple hosts at the same time. Chances are
+that for some PGs (placement groups), 2 out of the (default) 3 replicas will
+be down. This will result in I/O being halted until the minimum required number
+(`min_size`) of replicas is available again.
+
+To verify that the services are listening on the new network, you can run the
+following command on each node:
+
+[source,bash]
+----
+ss -tulpn | grep ceph
+----
+
+NOTE: Since OSDs will also listen on the Ceph Cluster network, expect to see that
+network too in the output of `ss -tulpn`.
+
+Once the Ceph cluster is back in a fully healthy state ('HEALTH_OK'), and the
+services are listening on the new network, continue to restart the services on
+the host.
+
+The last services that need to be moved to the new network are the Ceph MONs
+themselves. The easiest way is to destroy and recreate each monitor one by
+one. This way, any mention of it in the `ceph.conf` and the monitor internal
+`monmap` is handled automatically.
+
+Destroy the first MON and create it again. Wait a few moments before you
+continue on to the next MON in the cluster, and make sure the cluster reports
+'HEALTH_OK' before proceeding.
+
+Once all MONs are recreated, you can verify that any mention of MONs in the
+`ceph.conf` file references the new network. That means mainly the `mon_host`
+line and the `[mon.HOSTNAME]` sections.
+
+One final `ss -tulpn | grep ceph` should show that the old network is not used
+by any Ceph service anymore.
+
+[[pveceph_network_change_cluster]]
+Change the Ceph Cluster Network
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Ceph Cluster network is used for the replication traffic between the OSDs.
+Therefore, it can be beneficial to place it on its own fast physical network.
+
+The overall procedure is:
+
+1. Change `cluster_network` in the `/etc/pve/ceph.conf` file
+2. Restart OSDs on one host
+3. Wait until Ceph is back to 'HEALTH_OK'
+4. Verify OSDs are using the new network
+5. Continue restarting OSDs on the next host
+
+You first need to edit the `/etc/pve/ceph.conf` file. Change the
+`cluster_network` line to match the new subnet.
+
+----
+cluster_network = 10.9.9.30/24
+----
+
+NOTE: Don't worry if the host bits (for example, the last octet) are set by
+default; the netmask in CIDR notation defines the network part.
+
+After you have changed the network, you need to restart the OSDs in the cluster
+for the changes to take effect. Do so one node at a time!
+To restart all OSDs on one node, you can use the following command on the CLI on
+that node:
+
+[source,bash]
+----
+systemctl restart ceph-osd.target
+----
+
+WARNING: Do not restart OSDs on multiple hosts at the same time. Chances are
+that for some PGs (placement groups), 2 out of the (default) 3 replicas will
+be down. This will result in I/O being halted until the minimum required number
+(`min_size`) of replicas is available again.
+
+To verify that the OSD services are listening on the new network, you can either
+check the *OSD Details -> Network* tab in the *Ceph -> OSD* panel or by running
+the following command on the host:
+[source,bash]
+----
+ss -tulpn | grep ceph-osd
+----
+
+NOTE: Since OSDs will also listen on the Ceph Public network, expect to see that
+network too in the output of `ss -tulpn`.
+
+Once the Ceph cluster is back in a fully healthy state ('HEALTH_OK'), and the
+OSDs are listening on the new network, continue to restart the OSDs on the next
+host.
+
+
+[[pve_ceph_mon_and_ts]]
+Ceph Monitoring and Troubleshooting
+-----------------------------------
+
+It is important to continuously monitor the health of a Ceph deployment from the
+beginning, either by using the Ceph tools or by accessing
+the status through the {pve} link:api-viewer/index.html[API].
+
+The following Ceph commands can be used to see if the cluster is healthy
+('HEALTH_OK'), if there are warnings ('HEALTH_WARN'), or even errors
+('HEALTH_ERR'). If the cluster is in an unhealthy state, the status commands
+below will also give you an overview of the current events and actions to take.
+To stop their execution, press CTRL-C.
+
+Continuously watch the cluster status:
+[source,bash]
+----
+watch ceph --status
+----
+
+Print the cluster status once (not being updated) and continuously append lines of status events:
+[source,bash]
+----
+ceph --watch
+----
+
+[[pve_ceph_ts]]
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+This section includes frequently used troubleshooting information.
+More information can be found on the official Ceph website under
+Troubleshooting
+footnote:[Ceph troubleshooting {cephdocs-url}/rados/troubleshooting/].
+
+[[pve_ceph_ts_logs]]
+.Relevant Logs on Affected Node
+
+* xref:disk_health_monitoring[Disk Health Monitoring]
+* __System -> System Log__ or via the CLI, for example of the last 2 days:
++
+[source,bash]
+----
+journalctl --since "2 days ago"
+----
+* IPMI and RAID controller logs
+
+Ceph service crashes can be listed and viewed in detail by running the following
+commands:
+[source,bash]
+----
+ceph crash ls
+ceph crash info <crash_id>
+----
+Crashes marked as new can be acknowledged by running:
+[source,bash]
+----
+ceph crash archive-all
+----
+
+To get a more detailed view, every Ceph service has a log file under
+`/var/log/ceph/`. If more detail is required, the log level can be
+adjusted footnote:[Ceph log and debugging {cephdocs-url}/rados/troubleshooting/log-and-debug/].
+
+[[pve_ceph_ts_causes]]
+.Common Causes of Ceph Problems
+
+* Network problems like congestion, a faulty switch, a shut down
+interface or a blocking firewall. Check whether all {pve} nodes are
+reliably reachable on the
+xref:pvecm_cluster_network[corosync cluster network] and on the
+xref:pve_ceph_install_wizard[Ceph public and cluster network].
+
+* Disk or connection parts which are:
+** defective
+** not firmly mounted
+** lacking I/O performance under higher load (e.g. when using HDDs,
+consumer hardware or
+xref:pve_ceph_recommendation_raid[inadvisable RAID controllers])
+
+* Not fulfilling the xref:_recommendations_for_a_healthy_ceph_cluster[recommendations] for
+a healthy Ceph cluster.
+
+[[pve_ceph_ts_problems]]
+.Common Ceph Problems
+ ::
+
+OSDs `down`/crashed:::
+A faulty OSD will be reported as `down` and mostly (auto) `out` 10
+minutes later. Depending on the cause, it can also automatically
+become `up` and `in` again. To try a manual activation via web
+interface, go to __Any node -> Ceph -> OSD__, select the OSD and click
+on **Start**, **In** and **Reload**. When using the shell, run following
+command on the affected node:
++
+[source,bash]
+----
+ceph-volume lvm activate --all
+----
++
+To activate a failed OSD, it may be necessary to
+xref:ha_manager_node_maintenance[safely reboot] the respective node
+or, as a last resort, to
+xref:pve_ceph_osd_replace[recreate or replace] the OSD.
+
+ifdef::manvolnum[]
+include::pve-copyright.adoc[]
+endif::manvolnum[]

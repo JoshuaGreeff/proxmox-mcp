@@ -1,0 +1,207 @@
+[[cli_pvecm]]
+*pvecm* `<COMMAND> [ARGS] [OPTIONS]`
+
+[[cli_pvecm_add]]
+*pvecm add* `<hostname>` `[OPTIONS]`
+
+Adds the current node to an existing cluster.
+
+`<hostname>`: `<string>` ::
+
+Hostname (or IP) of an existing cluster member.
+
+`--fingerprint` `([A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}` ::
+
+Certificate SHA 256 fingerprint.
+
+`--force` `<boolean>` ::
+
+Do not throw error if node already exists.
+
+`--link[n]` `[address=]<IP> [,priority=<integer>]` ::
+
+Address and priority information of a single corosync link. (up to 8 links supported; link0..link7)
+
+`--nodeid` `<integer> (1 - N)` ::
+
+Node id for this node.
+
+`--use_ssh` `<boolean>` ::
+
+Always use SSH to join, even if peer may do it over API.
+
+`--votes` `<integer> (0 - N)` ::
+
+Number of votes for this node
+
+[[cli_pvecm_addnode]]
+*pvecm addnode* `<node>` `[OPTIONS]`
+
+Adds a node to the cluster configuration. This call is for internal use.
+
+`<node>`: `<string>` ::
+
+The cluster node name.
+
+`--apiversion` `<integer>` ::
+
+The JOIN_API_VERSION of the new node.
+
+`--force` `<boolean>` ::
+
+Do not throw error if node already exists.
+
+`--link[n]` `[address=]<IP> [,priority=<integer>]` ::
+
+Address and priority information of a single corosync link. (up to 8 links supported; link0..link7)
+
+`--new_node_ip` `<string>` ::
+
+IP Address of node to add. Used as fallback if no links are given.
+
+`--nodeid` `<integer> (1 - N)` ::
+
+Node id for this node.
+
+`--votes` `<integer> (0 - N)` ::
+
+Number of votes for this node
+
+[[cli_pvecm_apiver]]
+*pvecm apiver*
+
+Return the version of the cluster join API available on this node.
+
+[[cli_pvecm_create]]
+*pvecm create* `<clustername>` `[OPTIONS]`
+
+Generate new cluster configuration. If no links given, default to local IP
+address as link0.
+
+`<clustername>`: `<string>` ::
+
+The name of the cluster.
+
+`--link[n]` `[address=]<IP> [,priority=<integer>]` ::
+
+Address and priority information of a single corosync link. (up to 8 links supported; link0..link7)
+
+`--nodeid` `<integer> (1 - N)` ::
+
+Node id for this node.
+
+`--votes` `<integer> (1 - N)` ::
+
+Number of votes for this node.
+
+[[cli_pvecm_delnode]]
+*pvecm delnode* `<node>`
+
+Removes a node from the cluster configuration.
+
+`<node>`: `<string>` ::
+
+The cluster node name.
+
+[[cli_pvecm_expected]]
+*pvecm expected* `<expected>`
+
+Tells corosync a new value of expected votes.
+
+`<expected>`: `<integer> (1 - N)` ::
+
+Expected votes
+
+[[cli_pvecm_help]]
+*pvecm help* `[OPTIONS]`
+
+Get help about specified command.
+
+`--extra-args` `<array>` ::
+
+Shows help for a specific command
+
+`--verbose` `<boolean>` ::
+
+Verbose output format.
+
+[[cli_pvecm_keygen]]
+*pvecm keygen* `<filename>`
+
+Generate new cryptographic key for corosync.
+
+`<filename>`: `<string>` ::
+
+Output file name
+
+[[cli_pvecm_mtunnel]]
+*pvecm mtunnel* `[<extra-args>]` `[OPTIONS]`
+
+Used by VM/CT migration - do not use manually.
+
+`<extra-args>`: `<array>` ::
+
+Extra arguments as array
+
+`--get_migration_ip` `<boolean>` ('default =' `0`)::
+
+return the migration IP, if configured
+
+`--migration_network` `<string>` ::
+
+the migration network used to detect the local migration IP
+
+`--run-command` `<boolean>` ::
+
+Run a command with a tcp socket as standard input. The IP address and port are printed via this command's stdandard output first, each on a separate line.
+
+[[cli_pvecm_nodes]]
+*pvecm nodes*
+
+Displays the local view of the cluster nodes.
+
+[[cli_pvecm_qdevice_remove]]
+*pvecm qdevice remove*
+
+Remove a configured QDevice
+
+[[cli_pvecm_qdevice_setup]]
+*pvecm qdevice setup* `<address>` `[OPTIONS]`
+
+Setup the use of a QDevice
+
+`<address>`: `<string>` ::
+
+Specifies the network address of an external corosync QDevice
+
+`--force` `<boolean>` ::
+
+Do not throw error on possible dangerous operations.
+
+`--network` `<string>` ::
+
+The network which should be used to connect to the external qdevice
+
+[[cli_pvecm_status]]
+*pvecm status*
+
+Displays the local view of the cluster status.
+
+[[cli_pvecm_updatecerts]]
+*pvecm updatecerts* `[OPTIONS]`
+
+Update node certificates (and generate all needed files/directories).
+
+`--force` `<boolean>` ::
+
+Force generation of new SSL certificate.
+
+`--silent` `<boolean>` ::
+
+Ignore errors (i.e. when cluster has no quorum).
+
+`--unmerge-known-hosts` `<boolean>` ('default =' `0`)::
+
+Unmerge legacy SSH known hosts.
+
+

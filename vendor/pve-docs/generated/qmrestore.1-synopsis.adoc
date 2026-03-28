@@ -1,0 +1,48 @@
+[[cli_qmrestore_help]]
+*qmrestore* `help`
+
+[[cli_qmrestore]]
+*qmrestore* `<archive> <vmid>` `[OPTIONS]`
+
+Restore QemuServer vzdump backups.
+
+`<archive>`: `<string>` ::
+
+The backup file. You can pass '-' to read from standard input.
+
+`<vmid>`: `<integer> (100 - 999999999)` ::
+
+The (unique) ID of the VM.
+
+`--bwlimit` `<number> (0 - N)` ::
+
+Override I/O bandwidth limit (in KiB/s).
+
+`--force` `<boolean>` ::
+
+Allow to overwrite existing VM.
+
+`--ha-managed` `<boolean>` ('default =' `0`)::
+
+Add the VM as a HA resource after it was restored.
+
+`--live-restore` `<boolean>` ::
+
+Start the VM immediately from the backup and restore in background. PBS only.
+
+`--pool` `<string>` ::
+
+Add the VM to the specified pool.
+
+`--start` `<boolean>` ('default =' `0`)::
+
+Start VM after it was restored successfully.
+
+`--storage` `<storage ID>` ::
+
+Default storage.
+
+`--unique` `<boolean>` ::
+
+Assign a unique random ethernet address.
+
