@@ -49,6 +49,7 @@ See [Production Readiness](./docs/production-readiness.md) for the current suppo
 - [Contributing](./CONTRIBUTING.md)
 - [Changelog](./CHANGELOG.md)
 - [Branching Workflow](./docs/branching.md)
+- [Publishing](./docs/publishing.md)
 
 ## Current Scope
 

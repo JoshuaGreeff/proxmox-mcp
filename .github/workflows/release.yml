@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions: read-all
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      NPM_TOKEN_PRESENT: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Setup npm 11 for publishing
+        run: npm install --global npm@^11.10.0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate
+        run: |
+          npm run check
+          npm run test
+          npm run test:fuzz
+          npm run build
+
+      - name: Pack
+        run: npm pack
+
+      - name: Publish to npm with token
+        if: ${{ env.NPM_TOKEN_PRESENT != '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          {
+            echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}"
+            echo "registry=https://registry.npmjs.org/"
+          } > "$RUNNER_TEMP/.npmrc"
+          npm publish --access public --provenance --userconfig "$RUNNER_TEMP/.npmrc"
+
+      - name: Publish to npm with trusted publishing
+        if: ${{ env.NPM_TOKEN_PRESENT == '' }}
+        run: npm publish --access public

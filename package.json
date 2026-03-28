@@ -34,6 +34,18 @@
   "directories": {
     "doc": "docs"
   },
+  "files": [
+    "dist",
+    "vendor/pve-docs/api-viewer/apidata.js",
+    "vendor/pve-docs/LICENSE",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\"",
     "dev": "tsx src/index.ts",
@@ -43,6 +55,7 @@
     "test": "vitest run tests",
     "test:fuzz": "vitest run tests/fuzz.test.ts",
     "test:live": "vitest run tests/live",
+    "pack:check": "npm pack --dry-run",
     "generate:api-summary": "node scripts/extract-proxmox-api-summary.mjs",
     "generate:module-inventory": "node scripts/generate-proxmox-module-inventory.mjs",
     "update:proxmox-docs": "powershell -ExecutionPolicy Bypass -File scripts/update-proxmox-docs.ps1"
