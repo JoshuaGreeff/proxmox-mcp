@@ -1,0 +1,52 @@
+# Contributing
+
+Thanks for contributing to `proxmox-mcp`.
+
+## Branch Flow
+
+This repo uses a staged branch model:
+
+- branch normal work from `dev`
+- use short-lived `feature/*` branches for implementation
+- merge finished feature work into `dev`
+- promote `dev` into `main` only when the integrated state is fully tested and ready for production
+- branch urgent fixes from `main` as `hotfix/*`, then back-merge those fixes into `dev`
+
+`main` is the production-ready branch. `dev` is the integration branch.
+
+## Local Checks
+
+Run these before opening a PR or merging a non-trivial change:
+
+```bash
+npm run check
+npm run test
+npm run build
+```
+
+If a change affects disposable live validation paths, run the documented live checks as well.
+
+## Repo Safety Rules
+
+- do not commit secrets, credentials, private keys, audit logs, or confidential lab details
+- keep runtime secrets in env or the configured secret backend, never in tracked files
+- keep docs aligned with actual behavior, validated workflows, and current repo policy
+- prefer small, auditable changes over broad rewrites when updating validated Proxmox behavior
+
+## Docs Expectations
+
+Documentation is part of the product surface. Update the relevant docs in the same change whenever you alter:
+
+- setup or deployment behavior
+- tool names or tool behavior
+- branching or maintainer workflow
+- validated lab assumptions
+
+## Pull Requests
+
+When opening a PR:
+
+- target `dev` for normal work
+- target `main` only for release promotions from `dev` or urgent `hotfix/*` work
+- summarize operator-visible behavior changes clearly
+- call out any high-risk shell, file, or mutation-path changes explicitly

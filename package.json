@@ -2,6 +2,26 @@
   "name": "proxmox-mcp",
   "version": "0.1.0",
   "description": "stdio MCP server for operating Proxmox VE through typed tools plus explicit high-risk escape hatches.",
+  "author": "Joshua Greeff",
+  "homepage": "https://github.com/JoshuaGreeff/proxmox-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoshuaGreeff/proxmox-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JoshuaGreeff/proxmox-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "proxmox",
+    "proxmox-ve",
+    "virtualization",
+    "infrastructure-automation"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -23,8 +43,6 @@
     "generate:module-inventory": "node scripts/generate-proxmox-module-inventory.mjs",
     "update:proxmox-docs": "powershell -ExecutionPolicy Bypass -File scripts/update-proxmox-docs.ps1"
   },
-  "keywords": [],
-  "author": "",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",

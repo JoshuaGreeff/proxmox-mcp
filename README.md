@@ -1,6 +1,13 @@
 # Proxmox-MCP
 
-`Proxmox-MCP` is an MCP server for operating Proxmox VE through three layers used together:
+[![CI](https://img.shields.io/github/actions/workflow/status/JoshuaGreeff/proxmox-mcp/ci.yml?branch=main&label=ci)](https://github.com/JoshuaGreeff/proxmox-mcp/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/JoshuaGreeff/proxmox-mcp/codeql.yml?branch=main&label=codeql)](https://github.com/JoshuaGreeff/proxmox-mcp/actions/workflows/codeql.yml)
+[![OpenSSF Scorecards](https://img.shields.io/github/actions/workflow/status/JoshuaGreeff/proxmox-mcp/scorecards.yml?branch=main&label=scorecards)](https://github.com/JoshuaGreeff/proxmox-mcp/actions/workflows/scorecards.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![Status: Beta](https://img.shields.io/badge/status-beta-1f6feb)](./docs/production-readiness.md)
+[![GitHub stars](https://img.shields.io/github/stars/JoshuaGreeff/proxmox-mcp?style=social)](https://github.com/JoshuaGreeff/proxmox-mcp/stargazers)
+
+`Proxmox-MCP` is a typed MCP server for operating Proxmox VE through three layers used together:
 
 - Proxmox REST for the management plane
 - Proxmox CLI over SSH for node-local coverage gaps
@@ -11,6 +18,37 @@ The server is built against the official Proxmox API schema vendored in `vendor/
 The framework grows by validated domain modules. A workflow only becomes a typed MCP tool after it has been exercised end-to-end in the lab. Everything else remains available through the generic API/CLI/shell/file escape hatches until it is validated.
 
 The maintained schema-derived roadmap for module coverage lives in [module-inventory.md](./docs/proxmox/module-inventory.md).
+
+## What This Is / What It Is Not
+
+What this is:
+
+- a real MCP server with typed Proxmox tools backed by official upstream docs and schema
+- a client-agnostic control surface that works over stdio today and targets remote HTTP deployment with OIDC
+- an operator-focused server that keeps high-risk shell, file, and guest access explicit instead of hiding it behind vague workflow wrappers
+
+What this is not:
+
+- a thin wrapper around ad hoc local scripts
+- a fully packaged production platform with release artifacts, hosted docs, and long-term compatibility guarantees already locked down
+- a policy-free remote shell broker; high-risk access stays deliberate and auditable
+
+## Project Status
+
+`Proxmox-MCP` is currently `Beta`.
+
+- local `stdio` validation is in place and is the primary maintainer workflow
+- `http + oidc + file|vault` is the intended production deployment shape
+- release packaging, broader deployment validation, and deeper operational maturity are still in progress
+
+See [Production Readiness](./docs/production-readiness.md) for the current support boundaries and remaining gaps.
+
+## Community / Maintainer Docs
+
+- [Security Policy](./SECURITY.md)
+- [Contributing](./CONTRIBUTING.md)
+- [Changelog](./CHANGELOG.md)
+- [Branching Workflow](./docs/branching.md)
 
 ## Current Scope
 

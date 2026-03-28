@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a typed tool, workflow improvement, or repo enhancement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What operator or maintainer problem is not well served today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the capability you want and how you expect to use it.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Typed MCP tools
+        - REST completeness
+        - CLI or shell escape hatches
+        - Auth or secret backends
+        - Docs or repo workflow
+        - Testing or validation
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What do you do today, and why is it insufficient?
