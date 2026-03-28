@@ -1,6 +1,6 @@
 {
   "name": "proxmox-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "stdio MCP server for operating Proxmox VE through typed tools plus explicit high-risk escape hatches.",
   "author": "Joshua Greeff",
   "homepage": "https://github.com/JoshuaGreeff/proxmox-mcp",

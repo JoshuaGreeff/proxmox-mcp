@@ -41,6 +41,8 @@ After the trusted publisher is configured and verified:
 2. in npm package settings, restrict publishing access to trusted publishing and disallow token publishing
 3. revoke any no-longer-needed npm publish token
 
+This repo is now expected to stay in that trusted-publishing state for future releases.
+
 ## Package Contents
 
 The npm package intentionally ships only:
