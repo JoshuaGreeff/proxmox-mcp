@@ -219,6 +219,17 @@ Those stay outside the MCP product surface because they operate on the maintaine
 
 ## Development
 
+Branching and promotion flow:
+
+- `main` is the production-ready branch
+- `dev` is the integration and pre-release branch
+- normal work should branch from `dev` into short-lived `feature/*` branches, then merge back into `dev`
+- release promotion should happen by merging `dev` into `main`
+- urgent fixes may target `main` through `hotfix/*` branches, but must be back-merged into `dev`
+- branch protection exists on both branches, but owner/admin bypass remains available for emergencies
+
+See [Branching Workflow](./docs/branching.md) for the maintainer process.
+
 ```bash
 npm install
 npm run check
@@ -271,6 +282,7 @@ npm run test:live
 - `docs/proxmox/module-inventory.md`
 - `docs/proxmox/module-inventory.json`
 - `docs/direct-mcp-testing.md`
+- `docs/branching.md`
 - `docs/production-readiness.md`
 - `docs/getting-started.md`
 - `docs/deployment.md`

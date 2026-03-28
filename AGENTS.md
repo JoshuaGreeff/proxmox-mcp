@@ -74,6 +74,9 @@ Current priority:
 - Keep config and tool names stable unless a breaking rename is justified and documented.
 - Keep the developed app's documentation up to date as part of normal implementation work. When behavior, setup, tool surface, lab state, or operator workflow changes, update the relevant tracked docs in the same change.
 - Keep lab documentation aligned with what has actually been validated on the disposable T2 environment, not just the intended design.
+- Treat `main` as the production-ready branch and `dev` as the integration branch.
+- Prefer `feature/*` branches off `dev` for normal work. Promote to `main` from `dev` only after integration testing and release checks are complete.
+- If a hotfix must land on `main`, back-merge it into `dev` immediately so the branches do not drift.
 
 ## Expected Repo Changes
 - Keep generated Proxmox summaries reproducible from upstream sources.
@@ -81,3 +84,4 @@ Current priority:
 - Prefer small, auditable scripts over one-off manual extraction steps.
 - Keep README and `config.toml` env examples aligned with the actual implemented MCP surface.
 - If new typed tools are added, update the documented tool inventory and keep escape-hatch usage narrow.
+- Keep branching and release workflow docs aligned with the enforced GitHub branch protections and CI triggers.

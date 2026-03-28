@@ -12,6 +12,14 @@
 
 The remaining work is no longer “invent the security model”; it is mostly release hardening and operational polish.
 
+## Branch Roles
+
+- `main` is the production-ready branch
+- `dev` is the integration and pre-release branch
+- normal development should flow through `feature/*` branches into `dev`
+- production promotion should happen by merging `dev` into `main`
+- urgent hotfixes may land on `main`, but must be back-merged into `dev`
+
 ## Supported Modes
 
 | Area | Status | Notes |
