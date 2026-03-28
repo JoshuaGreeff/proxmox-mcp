@@ -45,7 +45,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@modelcontextprotocol/sdk": "^1.28.0",
     "ssh2": "^1.17.0",
     "undici": "^7.24.3",
     "yaml": "^2.8.2",
