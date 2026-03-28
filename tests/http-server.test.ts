@@ -56,4 +56,26 @@ describe("proxmox mcp http server", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("www-authenticate")).toContain("Bearer");
   });
+
+  it("does not expose internal error details on malformed request bodies", async () => {
+    const mcpServer = new McpServer({ name: "test-server", version: "0.0.0" });
+    const handle = await startProxmoxMcpHttpServer({
+      server: mcpServer,
+      host: "127.0.0.1",
+      port: 0,
+    });
+    handles.push(handle);
+
+    const address = handle.server.address() as AddressInfo;
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+
+    const response = await fetch(`${baseUrl}/mcp`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{",
+    });
+
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe("Internal Server Error");
+  });
 });

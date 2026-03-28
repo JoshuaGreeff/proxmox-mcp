@@ -87,6 +87,10 @@ async function readRequestBody(req: IncomingMessage): Promise<unknown> {
   return raw;
 }
 
+function logHttpServerError(error: unknown): void {
+  console.error(error instanceof Error ? error.stack ?? error.message : String(error));
+}
+
 function writeJson(res: ServerResponse, statusCode: number, payload: unknown): void {
   res.statusCode = statusCode;
   res.setHeader("content-type", "application/json; charset=utf-8");
@@ -223,8 +227,8 @@ export async function createProxmoxMcpHttpServer(options: ProxmoxMcpHttpServerOp
         return;
       }
 
-      const message = error instanceof Error ? error.message : String(error);
-      writeText(res, 500, message);
+      logHttpServerError(error);
+      writeText(res, 500, "Internal Server Error");
     }
   });
 
