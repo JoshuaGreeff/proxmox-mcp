@@ -41,6 +41,7 @@
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run tests",
+    "test:fuzz": "vitest run tests/fuzz.test.ts",
     "test:live": "vitest run tests/live",
     "generate:api-summary": "node scripts/extract-proxmox-api-summary.mjs",
     "generate:module-inventory": "node scripts/generate-proxmox-module-inventory.mjs",
@@ -57,6 +58,7 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@types/ssh2": "^1.15.5",
+    "fast-check": "^4.6.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.2"
