@@ -1,0 +1,43 @@
+{
+  "name": "proxmox-mcp",
+  "version": "0.1.0",
+  "description": "stdio MCP server for operating Proxmox VE through typed tools plus explicit high-risk escape hatches.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "proxmox-mcp": "dist/index.js",
+    "proxmox-mcp-admin": "dist/admin-cli.js"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\"",
+    "dev": "tsx src/index.ts",
+    "admin": "tsx src/admin-cli.ts",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run tests",
+    "test:live": "vitest run tests/live",
+    "generate:api-summary": "node scripts/extract-proxmox-api-summary.mjs",
+    "generate:module-inventory": "node scripts/generate-proxmox-module-inventory.mjs",
+    "update:proxmox-docs": "powershell -ExecutionPolicy Bypass -File scripts/update-proxmox-docs.ps1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "ssh2": "^1.17.0",
+    "undici": "^7.24.3",
+    "yaml": "^2.8.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/ssh2": "^1.15.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}

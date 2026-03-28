@@ -1,0 +1,19 @@
+node_modules/
+dist/
+
+# Local runtime state
+.proxmox-mcp/
+.proxmox-mcp-audit.log
+.proxmox-mcp-audit.jsonl
+.proxmox-mcp-secrets.json
+.remote-connect-mcp/
+.remote-connect-mcp-audit.log
+.remote-connect-mcp-audit.jsonl
+artifacts/
+
+# Common local secrets and env files
+*.env
+*.env.local
+*.key
+*.pem
+*.bak.*

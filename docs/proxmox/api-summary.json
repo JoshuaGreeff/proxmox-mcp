@@ -1,0 +1,261 @@
+{
+  "generatedAt": "2026-03-15T04:25:20.453Z",
+  "source": "vendor/pve-docs/api-viewer/apidata.js",
+  "totals": {
+    "paths": 432,
+    "methods": 646,
+    "methodBreakdown": {
+      "GET": 326,
+      "POST": 167,
+      "DELETE": 74,
+      "PUT": 79
+    }
+  },
+  "topLevel": [
+    {
+      "path": "/cluster",
+      "childCount": 20,
+      "pathCount": 127,
+      "methodCount": 232,
+      "methodBreakdown": {
+        "GET": 115,
+        "POST": 45,
+        "DELETE": 35,
+        "PUT": 37
+      }
+    },
+    {
+      "path": "/nodes",
+      "childCount": 1,
+      "pathCount": 275,
+      "methodCount": 356,
+      "methodBreakdown": {
+        "GET": 187,
+        "POST": 109,
+        "DELETE": 30,
+        "PUT": 30
+      }
+    },
+    {
+      "path": "/storage",
+      "childCount": 1,
+      "pathCount": 2,
+      "methodCount": 5,
+      "methodBreakdown": {
+        "GET": 2,
+        "POST": 1,
+        "DELETE": 1,
+        "PUT": 1
+      }
+    },
+    {
+      "path": "/access",
+      "childCount": 11,
+      "pathCount": 25,
+      "methodCount": 45,
+      "methodBreakdown": {
+        "GET": 19,
+        "POST": 11,
+        "DELETE": 6,
+        "PUT": 9
+      }
+    },
+    {
+      "path": "/pools",
+      "childCount": 1,
+      "pathCount": 2,
+      "methodCount": 7,
+      "methodBreakdown": {
+        "DELETE": 2,
+        "GET": 2,
+        "POST": 1,
+        "PUT": 2
+      }
+    },
+    {
+      "path": "/version",
+      "childCount": 0,
+      "pathCount": 1,
+      "methodCount": 1,
+      "methodBreakdown": {
+        "GET": 1
+      }
+    }
+  ],
+  "notable": [
+    {
+      "path": "/nodes/{node}/execute",
+      "methods": {
+        "POST": {
+          "name": "execute",
+          "description": "Execute multiple commands in order, root only.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": null
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/termproxy",
+      "methods": {
+        "POST": {
+          "name": "termproxy",
+          "description": "Creates a VNC Shell proxy.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/vncshell",
+      "methods": {
+        "POST": {
+          "name": "vncshell",
+          "description": "Creates a VNC Shell proxy.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/qemu/{vmid}/agent/exec",
+      "methods": {
+        "POST": {
+          "name": "exec",
+          "description": "Executes the given command in the vm via the guest-agent and returns an object with the pid.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.GuestAgent.Unrestricted"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/qemu/{vmid}/agent/exec-status",
+      "methods": {
+        "GET": {
+          "name": "exec-status",
+          "description": "Gets the status of the given pid started by the guest-agent",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.GuestAgent.Unrestricted"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/qemu/{vmid}/agent/file-read",
+      "methods": {
+        "GET": {
+          "name": "file-read",
+          "description": "Reads the given file via guest agent. Is limited to 16777216 bytes.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.GuestAgent.FileRead",
+              "VM.GuestAgent.Unrestricted"
+            ],
+            "any",
+            1
+          ]
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/qemu/{vmid}/agent/file-write",
+      "methods": {
+        "POST": {
+          "name": "file-write",
+          "description": "Writes the given file via guest agent.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.GuestAgent.FileWrite",
+              "VM.GuestAgent.Unrestricted"
+            ],
+            "any",
+            1
+          ]
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/qemu/{vmid}/monitor",
+      "methods": {
+        "POST": {
+          "name": "monitor",
+          "description": "Execute QEMU monitor commands.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": "The following commands do not require any additional privilege: ?, help, info\n\nThe following commands require 'Sys.Modify': announce_self, backup_cancel, balloon, block_job_cancel, block_job_complete, block_job_pause, block_job_resume, block_job_set_speed, block_resize, block_set_io_throttle, boot_set, c, calc_dirty_rate, cancel_vcpu_dirty_limit, chardev-send-break, closefd, commit, cont, cpu, delvm, eject, exit_preconfig, expire_password, getfd, gpa2hpa, gpa2hva, gva2gpa, i, loadvm, log, migrate_cancel, migrate_continue, migrate_pause, migrate_set_capability, migrate_set_parameter, migrate_start_postcopy, mouse_button, mouse_move, mouse_set, one-insn-per-tb, p, print, q, qemu-io, qom-get, qom-list, quit, replay_break, replay_delete_break, replay_seek, ringbuf_read, ringbuf_write, s, savevm, sendkey, set_link, set_password, set_vcpu_dirty_limit, snapshot_blkdev_internal, snapshot_delete_blkdev_internal, stop, stopcapture, sum, sync-profile, system_powerdown, system_reset, system_wakeup, trace-event, x, x_colo_lost_heartbeat, xp\n\nThe following commands are root-only: backup, block_stream, change, chardev-add, chardev-change, chardev-remove, client_migrate_info, device_add, device_del, drive_add, drive_backup, drive_del, drive_mirror, dump-guest-memory, dumpdtb, gdbserver, hostfwd_add, hostfwd_remove, logfile, mce, memsave, migrate, migrate_incoming, migrate_recover, nbd_server_add, nbd_server_remove, nbd_server_start, nbd_server_stop, netdev_add, netdev_del, nmi, o, object_add, object_del, pcie_aer_inject_error, pmemsave, qom-set, savevm-end, savevm-start, screendump, snapshot_blkdev, watchdog_action, wavcapture, xen-event-inject, xen-event-list\n"
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/lxc/{vmid}/termproxy",
+      "methods": {
+        "POST": {
+          "name": "termproxy",
+          "description": "Creates a TCP proxy connection.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "path": "/nodes/{node}/lxc/{vmid}/vncproxy",
+      "methods": {
+        "POST": {
+          "name": "vncproxy",
+          "description": "Creates a TCP VNC proxy connections.",
+          "allowtoken": 1,
+          "protected": 1,
+          "permissions": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}
