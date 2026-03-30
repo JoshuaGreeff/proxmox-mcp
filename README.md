@@ -81,7 +81,7 @@ These are intentionally low-level, generic Proxmox primitives. The framework aim
 - `proxmox_vm_boot_diagnose`
 - `proxmox_vm_template_list`, `proxmox_vm_template_get`
 - `proxmox_storage_download_url`
-- `proxmox_vm_create`, `proxmox_vm_update_config`, `proxmox_vm_convert_to_template`, `proxmox_vm_clone`, `proxmox_vm_destroy`
+- `proxmox_vm_create`, `proxmox_vm_update_config`, `proxmox_vm_pci_attach`, `proxmox_vm_pci_detach`, `proxmox_vm_convert_to_template`, `proxmox_vm_clone`, `proxmox_vm_destroy`
 - `proxmox_cloud_init_snippet_list`, `proxmox_cloud_init_snippet_get`, `proxmox_cloud_init_snippet_put`, `proxmox_cloud_init_snippet_delete`, `proxmox_vm_cloud_init_dump`
 - `proxmox_lxc_list`, `proxmox_lxc_get`, `proxmox_lxc_action`
 - `proxmox_storage_list`, `proxmox_storage_get`
@@ -230,6 +230,10 @@ The validated provisioning and template primitives are:
   - creates a QEMU VM from low-level config arguments
 - `proxmox_vm_update_config`
   - updates QEMU VM config from low-level config arguments such as disks, cloud-init, serial console, ballooning, or SSH keys
+- `proxmox_vm_pci_attach`
+  - attaches a raw host PCI device or cluster PCI mapping through the typed QEMU config surface, using REST first and `qm set` only for the known root-only raw `hostpci` case
+- `proxmox_vm_pci_detach`
+  - detaches a `hostpci` slot through the typed QEMU config surface, with the same explicit REST-first transport behavior
 - `proxmox_vm_convert_to_template`
   - converts an existing VM into a template
 - `proxmox_vm_clone`

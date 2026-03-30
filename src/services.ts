@@ -31,6 +31,20 @@ function omitUndefined<T extends object>(value: T): Partial<T> {
   return Object.fromEntries(Object.entries(value as Record<string, unknown>).filter(([, entry]) => entry !== undefined)) as Partial<T>;
 }
 
+function parseBooleanFlag(value: boolean | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  return value ? "1" : "0";
+}
+
+function isHostpciPermissionFallbackError(error: unknown, configKey: string): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const quotedKey = configKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`only root can set '${quotedKey}' config for non-mapped devices`, "i").test(message);
+}
+
 /** Minimal cluster resource shape returned by `/cluster/resources`. */
 type CloudInitSection = "meta" | "network" | "user" | "vendor";
 
@@ -124,6 +138,94 @@ export interface VmCloneOptions {
   snapname?: string;
   bwlimit?: number;
   format?: "raw" | "qcow2" | "vmdk";
+}
+
+export interface VmPciPassthroughOptions {
+  slot: number;
+  host?: string;
+  mapping?: string;
+  deviceId?: string;
+  driver?: "vfio" | "keep";
+  legacyIgd?: boolean;
+  mdev?: string;
+  pcie?: boolean;
+  rombar?: boolean;
+  romfile?: string;
+  subDeviceId?: string;
+  subVendorId?: string;
+  vendorId?: string;
+  xVga?: boolean;
+}
+
+export interface VmPciPassthroughResult {
+  cluster: string;
+  node: string;
+  vmid: number;
+  slot: number;
+  configKey: string;
+  configValue?: string;
+  appliedVia: "rest" | "qm_cli_fallback";
+  fallbackReason?: string;
+  data: unknown;
+  upid?: string;
+}
+
+function buildHostpciConfigValue(options: VmPciPassthroughOptions): string {
+  const parts: string[] = [];
+
+  if (options.host) {
+    parts.push(`host=${options.host}`);
+  }
+
+  if (options.mapping) {
+    parts.push(`mapping=${options.mapping}`);
+  }
+
+  if (options.deviceId) {
+    parts.push(`device-id=${options.deviceId}`);
+  }
+
+  if (options.driver) {
+    parts.push(`driver=${options.driver}`);
+  }
+
+  if (options.legacyIgd !== undefined) {
+    parts.push(`legacy-igd=${parseBooleanFlag(options.legacyIgd)}`);
+  }
+
+  if (options.mdev) {
+    parts.push(`mdev=${options.mdev}`);
+  }
+
+  if (options.pcie !== undefined) {
+    parts.push(`pcie=${parseBooleanFlag(options.pcie)}`);
+  }
+
+  if (options.rombar !== undefined) {
+    parts.push(`rombar=${parseBooleanFlag(options.rombar)}`);
+  }
+
+  if (options.romfile) {
+    parts.push(`romfile=${options.romfile}`);
+  }
+
+  if (options.subDeviceId) {
+    parts.push(`sub-device-id=${options.subDeviceId}`);
+  }
+
+  if (options.subVendorId) {
+    parts.push(`sub-vendor-id=${options.subVendorId}`);
+  }
+
+  if (options.vendorId) {
+    parts.push(`vendor-id=${options.vendorId}`);
+  }
+
+  if (options.xVga !== undefined) {
+    parts.push(`x-vga=${parseBooleanFlag(options.xVga)}`);
+  }
+
+  return parts.join(",");
 }
 
 /**
@@ -1340,6 +1442,139 @@ find "$root_path/snippets" -type f | sed "s|^$root_path/snippets/||" | sort
       timeoutMs,
       signal,
     );
+  }
+
+  /** Attaches a host PCI device or cluster mapping to a QEMU VM. */
+  async vmAttachPciDevice(
+    cluster: string,
+    vmid: number,
+    options: VmPciPassthroughOptions,
+    nodeInput?: string,
+    timeoutMs?: number,
+    signal?: AbortSignal,
+  ): Promise<VmPciPassthroughResult> {
+    if ((!options.host && !options.mapping) || (options.host && options.mapping)) {
+      throw new Error("PCI attach requires exactly one of host or mapping.");
+    }
+
+    const node = nodeInput ?? (await this.getVmLocation(cluster, "qemu", vmid)).node!;
+    const configKey = `hostpci${options.slot}`;
+    const configValue = buildHostpciConfigValue(options);
+
+    try {
+      const response = await this.proxmoxApiCall(
+        { cluster, kind: "qemu_vm", node, vmid },
+        "PUT",
+        `/nodes/${node}/qemu/${vmid}/config`,
+        { [configKey]: configValue },
+        timeoutMs,
+        signal,
+      );
+
+      return {
+        cluster,
+        node,
+        vmid,
+        slot: options.slot,
+        configKey,
+        configValue,
+        appliedVia: "rest",
+        data: response.data,
+        upid: response.upid,
+      };
+    } catch (error) {
+      if (!options.host || options.mapping || !isHostpciPermissionFallbackError(error, configKey)) {
+        throw error;
+      }
+
+      const cliResult = await this.proxmoxCliRun(
+        { cluster, kind: "node", node },
+        "qm",
+        ["set", String(vmid), `-${configKey}`, configValue],
+        undefined,
+        timeoutMs,
+        signal,
+      );
+
+      if (cliResult.exitCode !== 0) {
+        throw new Error(cliResult.stderr || `qm set failed for ${configKey}`);
+      }
+
+      return {
+        cluster,
+        node,
+        vmid,
+        slot: options.slot,
+        configKey,
+        configValue,
+        appliedVia: "qm_cli_fallback",
+        fallbackReason: error instanceof Error ? error.message : String(error),
+        data: cliResult,
+      };
+    }
+  }
+
+  /** Detaches a host PCI slot from a QEMU VM. */
+  async vmDetachPciDevice(
+    cluster: string,
+    vmid: number,
+    slot: number,
+    nodeInput?: string,
+    timeoutMs?: number,
+    signal?: AbortSignal,
+  ): Promise<VmPciPassthroughResult> {
+    const node = nodeInput ?? (await this.getVmLocation(cluster, "qemu", vmid)).node!;
+    const configKey = `hostpci${slot}`;
+
+    try {
+      const response = await this.proxmoxApiCall(
+        { cluster, kind: "qemu_vm", node, vmid },
+        "PUT",
+        `/nodes/${node}/qemu/${vmid}/config`,
+        { delete: configKey },
+        timeoutMs,
+        signal,
+      );
+
+      return {
+        cluster,
+        node,
+        vmid,
+        slot,
+        configKey,
+        appliedVia: "rest",
+        data: response.data,
+        upid: response.upid,
+      };
+    } catch (error) {
+      if (!isHostpciPermissionFallbackError(error, configKey)) {
+        throw error;
+      }
+
+      const cliResult = await this.proxmoxCliRun(
+        { cluster, kind: "node", node },
+        "qm",
+        ["set", String(vmid), "-delete", configKey],
+        undefined,
+        timeoutMs,
+        signal,
+      );
+
+      if (cliResult.exitCode !== 0) {
+        throw new Error(cliResult.stderr || `qm set -delete failed for ${configKey}`);
+      }
+
+      return {
+        cluster,
+        node,
+        vmid,
+        slot,
+        configKey,
+        appliedVia: "qm_cli_fallback",
+        fallbackReason: error instanceof Error ? error.message : String(error),
+        data: cliResult,
+      };
+    }
   }
 
   /** Converts an existing QEMU VM into a Proxmox template through the documented REST endpoint. */

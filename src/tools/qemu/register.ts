@@ -9,6 +9,7 @@ export function registerQemuTools(context: ServerContext) {
   const clusterSchema = z.string().describe("Configured cluster alias.");
   const nodeSchema = z.string().describe("Proxmox node name.");
   const vmidSchema = z.number().int().positive().describe("QEMU VM numeric ID.");
+  const pciSlotSchema = z.number().int().nonnegative().describe("Host PCI slot index, for example `0` for `hostpci0`.");
 
   // Uses: inventory discovery for QEMU VMs.
   server.registerTool("proxmox_vm_list", { description: "List QEMU VMs in a cluster.", inputSchema: { cluster: clusterSchema } }, async ({ cluster }) =>
@@ -230,6 +231,108 @@ export function registerQemuTools(context: ServerContext) {
       });
       const settled = await settleJob(jobManager, job.jobId, waitMode);
       return settled ? completedJobResult(settled, `VM ${vmid} config update finished`) : jobHandleResult(job, `VM ${vmid} config updating`);
+    },
+  );
+
+  // Uses: `/nodes/{node}/qemu/{vmid}/config` with `qm set` fallback for root-only raw hostpci updates.
+  server.registerTool(
+    "proxmox_vm_pci_attach",
+    {
+      description: "Attach a host PCI device or cluster PCI mapping to a QEMU VM. Uses REST first and falls back to `qm set` only for the known root-only raw `hostpci` case.",
+      inputSchema: {
+        cluster: clusterSchema,
+        vmid: vmidSchema,
+        node: z.string().optional().describe("Optional node override. The current VM location is resolved when omitted."),
+        slot: pciSlotSchema,
+        host: z.string().optional().describe("Raw host PCI ID or semicolon-separated function set, for example `0000:22:00` or `0000:21:00;0000:21:00.1`."),
+        mapping: z.string().optional().describe("Cluster PCI mapping ID. Use this instead of `host` for mapping-based passthrough."),
+        deviceId: z.string().optional().describe("Optional PCI device-id override in hex."),
+        driver: z.enum(["vfio", "keep"]).optional().describe("Optional driver handling mode from the documented `hostpci` syntax."),
+        legacyIgd: z.boolean().optional().describe("Whether to enable the legacy IGD option."),
+        mdev: z.string().optional().describe("Optional mediated device type."),
+        pcie: z.boolean().optional().describe("Whether to expose the device as PCIe in the guest."),
+        rombar: z.boolean().optional().describe("Whether to expose the device ROM BAR to the guest."),
+        romfile: z.string().optional().describe("Optional ROM file path under `/usr/share/kvm/`."),
+        subDeviceId: z.string().optional().describe("Optional PCI subsystem device-id override in hex."),
+        subVendorId: z.string().optional().describe("Optional PCI subsystem vendor-id override in hex."),
+        vendorId: z.string().optional().describe("Optional PCI vendor-id override in hex."),
+        xVga: z.boolean().optional().describe("Whether to mark the device as the guest's primary VGA device."),
+        ...commonExecutionSchema,
+      },
+    },
+    async ({ cluster, vmid, node, slot, host, mapping, deviceId, driver, legacyIgd, mdev, pcie, rombar, romfile, subDeviceId, subVendorId, vendorId, xVga, waitMode, timeoutMs, pollIntervalMs }, extra) => {
+      if ((!host && !mapping) || (host && mapping)) {
+        throw new Error("PCI attach requires exactly one of host or mapping.");
+      }
+
+      const response = await domains.qemu.attachPci(
+        cluster,
+        vmid,
+        { slot, host, mapping, deviceId, driver, legacyIgd, mdev, pcie, rombar, romfile, subDeviceId, subVendorId, vendorId, xVga },
+        node,
+        timeoutMs,
+        extra.signal,
+      );
+      const target: TargetRef = { cluster, kind: "qemu_vm", vmid, node: response.node };
+
+      if (!response.upid) {
+        const latest = await domains.qemu.get(cluster, vmid);
+        return textResult(`VM ${vmid} PCI slot ${slot} attached`, { ...response, config: latest.config });
+      }
+
+      const job = jobManager.create(target, "vm:pci_attach");
+      job.relatedUpid = response.upid;
+      jobManager.run(job.jobId, async (jobContext) => {
+        jobContext.setRelatedUpid(response.upid!);
+        const task = await service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
+          jobContext.setProgress(progress.progress, progress.total, progress.message);
+          await emitProgress(extra, progress);
+        });
+        const latest = await domains.qemu.get(cluster, vmid);
+        return { ...response, task, config: latest.config };
+      });
+
+      const settled = await settleJob(jobManager, job.jobId, waitMode);
+      return settled ? completedJobResult(settled, `VM ${vmid} PCI slot ${slot} attach finished`) : jobHandleResult(job, `VM ${vmid} PCI slot ${slot} attaching`);
+    },
+  );
+
+  // Uses: `/nodes/{node}/qemu/{vmid}/config` delete semantics with `qm set -delete` fallback if needed.
+  server.registerTool(
+    "proxmox_vm_pci_detach",
+    {
+      description: "Detach a `hostpci` slot from a QEMU VM. Uses REST first and falls back to `qm set -delete` only when needed.",
+      inputSchema: {
+        cluster: clusterSchema,
+        vmid: vmidSchema,
+        node: z.string().optional().describe("Optional node override. The current VM location is resolved when omitted."),
+        slot: pciSlotSchema,
+        ...commonExecutionSchema,
+      },
+    },
+    async ({ cluster, vmid, node, slot, waitMode, timeoutMs, pollIntervalMs }, extra) => {
+      const response = await domains.qemu.detachPci(cluster, vmid, slot, node, timeoutMs, extra.signal);
+      const target: TargetRef = { cluster, kind: "qemu_vm", vmid, node: response.node };
+
+      if (!response.upid) {
+        const latest = await domains.qemu.get(cluster, vmid);
+        return textResult(`VM ${vmid} PCI slot ${slot} detached`, { ...response, config: latest.config });
+      }
+
+      const job = jobManager.create(target, "vm:pci_detach");
+      job.relatedUpid = response.upid;
+      jobManager.run(job.jobId, async (jobContext) => {
+        jobContext.setRelatedUpid(response.upid!);
+        const task = await service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
+          jobContext.setProgress(progress.progress, progress.total, progress.message);
+          await emitProgress(extra, progress);
+        });
+        const latest = await domains.qemu.get(cluster, vmid);
+        return { ...response, task, config: latest.config };
+      });
+
+      const settled = await settleJob(jobManager, job.jobId, waitMode);
+      return settled ? completedJobResult(settled, `VM ${vmid} PCI slot ${slot} detach finished`) : jobHandleResult(job, `VM ${vmid} PCI slot ${slot} detaching`);
     },
   );
 
