@@ -42,7 +42,7 @@ function scopesForTool(name: string, args: Record<string, unknown>): ProxmoxMcpS
   }
 
   if (
-    /_(create|update|delete|destroy|action|start|stop|reboot|reset|resume|suspend|shutdown|download_url|clone|convert_to_template|put|write)$/.test(name)
+    /_(create|update|delete|destroy|action|start|stop|reboot|reset|resume|suspend|shutdown|download_url|clone|convert_to_template|put|write|attach|detach)$/.test(name)
   ) {
     return ["proxmox.mutate"];
   }

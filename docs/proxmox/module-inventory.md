@@ -2,7 +2,7 @@
 
 This inventory is generated from the vendored Proxmox API schema and maintained module definitions.
 
-Generated: 2026-03-22T18:14:05.267Z
+Generated: 2026-03-30T01:30:51.993Z
 
 | Module | Endpoint Prefixes | Tools | State | Preferred Transport | Matched Paths |
 | --- | --- | --- | --- | --- | ---: |
@@ -33,7 +33,7 @@ Generated: 2026-03-22T18:14:05.267Z
 | `node-apt` | `/nodes/{node}/apt` | — | `generic-only` | `REST + SSH fallback` | 5 |
 | `qemu-read` | `/nodes/{node}/qemu` | `proxmox_vm_list`<br>`proxmox_vm_get`<br>`proxmox_vm_template_list`<br>`proxmox_vm_template_get` | `validated` | `REST` | 75 |
 | `qemu-lifecycle` | `/nodes/{node}/qemu/{vmid}/status`<br>`/nodes/{node}/qemu/{vmid}/clone`<br>`/nodes/{node}/qemu/{vmid}/template`<br>`/nodes/{node}/qemu/{vmid}/resize` | `proxmox_vm_action`<br>`proxmox_vm_clone`<br>`proxmox_vm_convert_to_template`<br>`proxmox_vm_destroy` | `validated` | `REST` | 12 |
-| `qemu-config` | `/nodes/{node}/qemu`<br>`/nodes/{node}/qemu/{vmid}/config` | `proxmox_vm_create`<br>`proxmox_vm_update_config`<br>`proxmox_vm_cloud_init_dump` | `validated` | `REST + SSH fallback` | 75 |
+| `qemu-config` | `/nodes/{node}/qemu`<br>`/nodes/{node}/qemu/{vmid}/config` | `proxmox_vm_create`<br>`proxmox_vm_update_config`<br>`proxmox_vm_pci_attach`<br>`proxmox_vm_pci_detach`<br>`proxmox_vm_cloud_init_dump` | `validated` | `REST + SSH fallback` | 75 |
 | `qemu-guest-agent` | `/nodes/{node}/qemu/{vmid}/agent` | `proxmox_vm_guest_exec`<br>`proxmox_file_read`<br>`proxmox_file_write` | `validated` | `REST + guest agent` | 26 |
 | `qemu-console` | `/nodes/{node}/qemu/{vmid}/termproxy`<br>`/nodes/{node}/qemu/{vmid}/vncproxy` | `proxmox_console_ticket` | `typed` | `REST` | 2 |
 | `qemu-boot-diagnostics` | `/nodes/{node}/qemu/{vmid}/status`<br>`/nodes/{node}/qemu/{vmid}/config`<br>`/nodes/{node}/qemu/{vmid}/agent` | `proxmox_vm_boot_diagnose` | `typed` | `REST + CLI + SSH fallback` | 36 |
@@ -133,7 +133,7 @@ Includes template inspection because templates are QEMU resources.
 Low-level lifecycle and clone primitives are typed.
 
 ### qemu-config
-Cloud-init dump currently uses `qm cloudinit dump` via approved CLI.
+Cloud-init dump currently uses `qm cloudinit dump` via approved CLI. PCI passthrough uses REST first and falls back to `qm set` only for the known root-only raw non-mapped `hostpci` case.
 
 ### qemu-guest-agent
 Falls back to configured guest transports when guest agent is unavailable.

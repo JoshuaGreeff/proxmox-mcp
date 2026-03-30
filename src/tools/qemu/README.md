@@ -14,6 +14,8 @@ Current tools:
 - `proxmox_vm_template_get`
 - `proxmox_vm_create`
 - `proxmox_vm_update_config`
+- `proxmox_vm_pci_attach`
+- `proxmox_vm_pci_detach`
 - `proxmox_vm_convert_to_template`
 - `proxmox_vm_clone`
 - `proxmox_vm_destroy`
@@ -28,6 +30,7 @@ These tools map to QEMU endpoint families such as:
 
 Transport preference:
 - REST first for VM and template lifecycle/config work
+- PCI passthrough uses REST first and falls back to `qm set` only for the known root-only raw non-mapped `hostpci` case
 - guest execution prefers guest-agent-capable paths and falls back to validated guest transport only when necessary
 - diagnostics may aggregate several low-level signals when that makes guest boot and guest-agent failures easier to isolate
 

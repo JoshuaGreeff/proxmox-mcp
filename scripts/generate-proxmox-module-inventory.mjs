@@ -250,10 +250,10 @@ const modules = [
   {
     name: "qemu-config",
     endpointPrefixes: ["/nodes/{node}/qemu", "/nodes/{node}/qemu/{vmid}/config"],
-    tools: ["proxmox_vm_create", "proxmox_vm_update_config", "proxmox_vm_cloud_init_dump"],
+    tools: ["proxmox_vm_create", "proxmox_vm_update_config", "proxmox_vm_pci_attach", "proxmox_vm_pci_detach", "proxmox_vm_cloud_init_dump"],
     validationState: "validated",
     preferredTransport: "REST + SSH fallback",
-    notes: "Cloud-init dump currently uses `qm cloudinit dump` via approved CLI.",
+    notes: "Cloud-init dump currently uses `qm cloudinit dump` via approved CLI. PCI passthrough uses REST first and falls back to `qm set` only for the known root-only raw non-mapped `hostpci` case.",
   },
   {
     name: "qemu-guest-agent",
