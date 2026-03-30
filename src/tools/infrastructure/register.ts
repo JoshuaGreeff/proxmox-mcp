@@ -89,8 +89,7 @@ export function registerInfrastructureTools(context: ServerContext) {
         return textResult(`Backup started on ${node}`, result.data);
       }
 
-      const job = jobManager.create(target, "backup:start");
-      job.relatedUpid = result.upid;
+      const job = jobManager.createUpidJob(target, "backup:start", result.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(result.upid!);
         return service.waitForUpid(cluster, result.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {

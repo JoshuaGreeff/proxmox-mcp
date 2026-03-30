@@ -2,7 +2,114 @@ import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { artifactResult, commonExecutionSchema, completedJobResult, emitProgress, jobHandleResult, settleJob, textResult } from "../../mcp-common.js";
-import { CAPABILITY_NAMES, type TargetRef } from "../../types.js";
+import { parseUpidJobId } from "../../jobs.js";
+import { CAPABILITY_NAMES, type JobState, type ServerJob, type TargetRef } from "../../types.js";
+import { nowIso, sleep } from "../../utils.js";
+
+function upidNode(upid: string): string {
+  const node = upid.split(":")[1];
+  if (!node) {
+    throw new Error(`Invalid UPID '${upid}'`);
+  }
+  return node;
+}
+
+function upidStartedAt(upid: string): string {
+  const startHex = upid.split(":")[4];
+  if (!startHex) {
+    return nowIso();
+  }
+
+  const seconds = Number.parseInt(startHex, 16);
+  if (!Number.isFinite(seconds) || seconds <= 0) {
+    return nowIso();
+  }
+
+  return new Date(seconds * 1000).toISOString();
+}
+
+function normalizeTaskLogs(log: unknown): string[] {
+  if (!Array.isArray(log)) {
+    return [];
+  }
+
+  return log.map((entry) => {
+    if (typeof entry === "string") {
+      return entry;
+    }
+
+    if (entry && typeof entry === "object" && typeof (entry as { t?: unknown }).t === "string") {
+      return (entry as { t: string }).t;
+    }
+
+    return JSON.stringify(entry);
+  });
+}
+
+function classifyUpidState(status: unknown): { state: JobState; error?: string } {
+  const record = status && typeof status === "object" ? status as Record<string, unknown> : {};
+  if (record.status !== "stopped") {
+    return { state: "running" };
+  }
+
+  const exitStatus = typeof record.exitstatus === "string" ? record.exitstatus.trim() : "";
+  if (!exitStatus || exitStatus.toUpperCase() === "OK") {
+    return { state: "completed" };
+  }
+
+  if (/(abort|cancel|interrupt)/i.test(exitStatus)) {
+    return { state: "cancelled", error: exitStatus };
+  }
+
+  return { state: "failed", error: exitStatus };
+}
+
+async function readUpidJobSnapshot(context: ServerContext, jobId: string): Promise<ServerJob> {
+  const handle = parseUpidJobId(jobId);
+  if (!handle) {
+    throw new Error(`Unknown job '${jobId}'`);
+  }
+
+  const node = upidNode(handle.upid);
+  const status = await context.service.getTaskStatus(handle.target.cluster, node, handle.upid);
+  const log = await context.service.getTaskLog(handle.target.cluster, node, handle.upid);
+  const logs = normalizeTaskLogs(log);
+  const classified = classifyUpidState(status);
+
+  return {
+    jobId,
+    target: handle.target,
+    operation: handle.operation,
+    state: classified.state,
+    startedAt: upidStartedAt(handle.upid),
+    updatedAt: nowIso(),
+    logsAvailable: logs.length > 0,
+    logs,
+    resultRef: { type: "proxmox_upid", value: handle.upid },
+    relatedUpid: handle.upid,
+    result: {
+      status,
+      log,
+    },
+    ...(classified.error ? { error: classified.error } : {}),
+  };
+}
+
+async function waitForUpidJobSnapshot(context: ServerContext, jobId: string, timeoutMs?: number, signal?: AbortSignal): Promise<ServerJob> {
+  const started = Date.now();
+  while (true) {
+    const snapshot = await readUpidJobSnapshot(context, jobId);
+    if (snapshot.state !== "running") {
+      return snapshot;
+    }
+
+    if (timeoutMs !== undefined && Date.now() - started >= timeoutMs) {
+      return snapshot;
+    }
+
+    await sleep(1_000, signal);
+  }
+}
 
 /** Registers generic REST/CLI/shell escape hatches plus MCP resources, prompts, and job tools. */
 export function registerEscapeTools(context: ServerContext) {
@@ -40,13 +147,14 @@ export function registerEscapeTools(context: ServerContext) {
   server.registerResource(
     "job-log-resource",
     new ResourceTemplate("proxmox://jobs/{jobId}/logs", { list: undefined }),
-    { title: "Job Logs", description: "In-memory logs for background jobs created by this server.", mimeType: "text/plain" },
+    { title: "Job Logs", description: "Logs for a background job. UPID-backed jobs can be re-read from Proxmox across server restarts; process-run jobs are local to the current server.", mimeType: "text/plain" },
     async (uri, params) => {
       const jobId = Array.isArray(params.jobId) ? params.jobId[0] : params.jobId;
       if (!jobId) {
         throw new Error("Missing jobId parameter");
       }
-      const logs = jobManager.listLogs(jobId);
+      const localJob = jobManager.find(jobId);
+      const logs = localJob ? localJob.logs : (await readUpidJobSnapshot(context, jobId)).logs;
       return { contents: [{ uri: uri.href, mimeType: "text/plain", text: logs.join("") }] };
     },
   );
@@ -85,7 +193,7 @@ export function registerEscapeTools(context: ServerContext) {
   server.registerTool(
     "proxmox_api_call",
     {
-      description: "Call any documented Proxmox API endpoint by HTTP method and path. This is the completeness escape hatch for REST coverage.",
+      description: "Call any documented Proxmox API endpoint by HTTP method and path. This is the completeness escape hatch for REST coverage. When Proxmox returns a UPID task, deferred job follow-up can be resumed later through `job_*`.",
       inputSchema: { cluster: clusterSchema, method: z.enum(["GET", "POST", "PUT", "DELETE"]), path: z.string().min(1), args: z.record(z.string(), z.unknown()).default({}), ...commonExecutionSchema },
     },
     async ({ cluster, method, path, args, waitMode, timeoutMs, pollIntervalMs }, extra) => {
@@ -94,8 +202,7 @@ export function registerEscapeTools(context: ServerContext) {
       if (!result.upid) {
         return textResult(`API ${method} ${path}`, result.data);
       }
-      const job = jobManager.create(target, `api:${method}:${path}`);
-      job.relatedUpid = result.upid;
+      const job = jobManager.createUpidJob(target, `api:${method}:${path}`, result.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(result.upid!);
         return service.waitForUpid(cluster, result.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -111,7 +218,7 @@ export function registerEscapeTools(context: ServerContext) {
   server.registerTool(
     "proxmox_cli_run",
     {
-      description: "Run an allowed Proxmox CLI family command over SSH on a Proxmox node.",
+      description: "Run an allowed Proxmox CLI family command over SSH on a Proxmox node. Deferred jobs for this break-glass path are process-local to the current server.",
       inputSchema: {
         cluster: clusterSchema,
         node: z.string().min(1),
@@ -138,7 +245,7 @@ export function registerEscapeTools(context: ServerContext) {
   server.registerTool(
     "proxmox_shell_run",
     {
-      description: "Run a policy-gated shell command against a node or guest transport.",
+      description: "Run a policy-gated shell command against a node or guest transport. Deferred jobs for this break-glass path are process-local to the current server.",
       inputSchema: {
         cluster: clusterSchema,
         targetKind: targetKindSchema,
@@ -220,36 +327,65 @@ export function registerEscapeTools(context: ServerContext) {
     },
   );
 
-  server.registerTool("job_get", { description: "Get the current state of a background job managed by this server.", inputSchema: { jobId: z.string().min(1) } }, async ({ jobId }) =>
-    completedJobResult(jobManager.get(jobId), `Job ${jobId}`),
+  server.registerTool(
+    "job_get",
+    {
+      description: "Get the current state of a background job. UPID-backed jobs can be re-read from Proxmox across server sessions; process-run jobs require the same live server instance.",
+      inputSchema: { jobId: z.string().min(1) },
+    },
+    async ({ jobId }) => {
+      const localJob = jobManager.find(jobId);
+      return completedJobResult(localJob ?? await readUpidJobSnapshot(context, jobId), `Job ${jobId}`);
+    },
   );
 
   server.registerTool(
     "job_wait",
-    { description: "Wait for a background job to finish or return its current state after a timeout.", inputSchema: { jobId: z.string().min(1), timeoutMs: z.number().int().positive().optional() } },
-    async ({ jobId, timeoutMs }) => completedJobResult(await jobManager.wait(jobId, timeoutMs), `Job ${jobId}`),
+    {
+      description: "Wait for a background job to finish or return its current state after a timeout. UPID-backed jobs can be resumed across server sessions; process-run jobs cannot.",
+      inputSchema: { jobId: z.string().min(1), timeoutMs: z.number().int().positive().optional() },
+    },
+    async ({ jobId, timeoutMs }, extra) => {
+      const localJob = jobManager.find(jobId);
+      const settled = localJob ? await jobManager.wait(jobId, timeoutMs) : await waitForUpidJobSnapshot(context, jobId, timeoutMs, extra.signal);
+      return completedJobResult(settled, `Job ${jobId}`);
+    },
   );
 
   server.registerTool(
     "job_cancel",
-    { description: "Cancel a background job. Proxmox UPID tasks are cancelled when the API supports it.", inputSchema: { jobId: z.string().min(1) } },
+    {
+      description: "Cancel a background job. UPID-backed jobs request cancellation through Proxmox and remain rehydratable later; process-run jobs are cancelled only inside the current server process.",
+      inputSchema: { jobId: z.string().min(1) },
+    },
     async ({ jobId }) => {
-      const job = jobManager.get(jobId);
-      if (job.relatedUpid) {
+      const localJob = jobManager.find(jobId);
+      const rehydratable = parseUpidJobId(jobId);
+      if (localJob?.relatedUpid || rehydratable) {
+        const handle = rehydratable ?? { upid: localJob!.relatedUpid!, target: localJob!.target, operation: localJob!.operation, v: 1 as const };
         try {
-          await service.cancelUpid(job.target.cluster, job.relatedUpid);
+          await service.cancelUpid(handle.target.cluster, handle.upid);
         } catch {
           // Best effort.
         }
+        return completedJobResult(await readUpidJobSnapshot(context, jobId), `Cancellation requested for ${jobId}`);
       }
+
       return completedJobResult(await jobManager.cancel(jobId), `Job ${jobId} cancelled`);
     },
   );
 
   server.registerTool(
     "job_logs",
-    { description: "Read recent logs for a background job.", inputSchema: { jobId: z.string().min(1), limit: z.number().int().positive().default(200) } },
-    async ({ jobId, limit }) => textResult(`Logs for ${jobId}`, { jobId, logs: jobManager.listLogs(jobId, limit) }),
+    {
+      description: "Read recent logs for a background job. UPID-backed jobs are read from Proxmox task logs; process-run jobs return only current-server in-memory logs.",
+      inputSchema: { jobId: z.string().min(1), limit: z.number().int().positive().default(200) },
+    },
+    async ({ jobId, limit }) => {
+      const localJob = jobManager.find(jobId);
+      const logs = localJob ? localJob.logs.slice(-limit) : (await readUpidJobSnapshot(context, jobId)).logs.slice(-limit);
+      return textResult(`Logs for ${jobId}`, { jobId, logs });
+    },
   );
 
   server.registerTool(

@@ -1,6 +1,15 @@
 import type { ArtifactRef, ServerJob, TargetRef } from "./types.js";
 import { makeId, nowIso } from "./utils.js";
 
+const UPID_JOB_PREFIX = "proxmox_upid_job_";
+
+export interface UpidJobHandlePayload {
+  v: 1;
+  operation: string;
+  target: TargetRef;
+  upid: string;
+}
+
 /** Error shape for jobs that fail after producing partial diagnostic output. */
 export class JobExecutionError extends Error {
   constructor(message: string, readonly result?: unknown) {
@@ -18,6 +27,52 @@ export interface JobContext {
   setArtifacts: (artifacts: ArtifactRef[]) => void;
 }
 
+/** Encodes a rehydratable job id for tasks that Proxmox already persists by UPID. */
+export function makeUpidJobId(target: TargetRef, operation: string, upid: string): string {
+  const payload: UpidJobHandlePayload = {
+    v: 1,
+    operation,
+    target,
+    upid,
+  };
+  return `${UPID_JOB_PREFIX}${Buffer.from(JSON.stringify(payload), "utf8").toString("base64url")}`;
+}
+
+/** Parses a rehydratable UPID-backed job id into its structured payload. */
+export function parseUpidJobId(jobId: string): UpidJobHandlePayload | null {
+  if (!jobId.startsWith(UPID_JOB_PREFIX)) {
+    return null;
+  }
+
+  const encoded = jobId.slice(UPID_JOB_PREFIX.length);
+  if (!encoded) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")) as Partial<UpidJobHandlePayload>;
+    if (
+      parsed?.v !== 1
+      || typeof parsed.operation !== "string"
+      || !parsed.target
+      || typeof parsed.target.cluster !== "string"
+      || typeof parsed.target.kind !== "string"
+      || typeof parsed.upid !== "string"
+    ) {
+      return null;
+    }
+
+    return {
+      v: 1,
+      operation: parsed.operation,
+      target: parsed.target,
+      upid: parsed.upid,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * In-memory job registry for long-running MCP work.
  *
@@ -31,8 +86,15 @@ export class JobManager {
   private readonly completions = new Map<string, Promise<ServerJob>>();
 
   /** Creates the initial pending record before execution starts. */
-  create(target: TargetRef, operation: string): ServerJob {
-    const jobId = makeId("job");
+  create(
+    target: TargetRef,
+    operation: string,
+    options: {
+      jobId?: string;
+      relatedUpid?: string;
+    } = {},
+  ): ServerJob {
+    const jobId = options.jobId ?? makeId("job");
     const snapshot: ServerJob = {
       jobId,
       target,
@@ -42,15 +104,37 @@ export class JobManager {
       updatedAt: nowIso(),
       logsAvailable: false,
       logs: [],
+      ...(options.relatedUpid
+        ? {
+            relatedUpid: options.relatedUpid,
+            resultRef: {
+              type: "proxmox_upid" as const,
+              value: options.relatedUpid,
+            },
+          }
+        : {}),
     };
 
     this.jobs.set(jobId, snapshot);
     return snapshot;
   }
 
+  /** Creates a job whose identity can be reconstructed later from its Proxmox UPID. */
+  createUpidJob(target: TargetRef, operation: string, upid: string): ServerJob {
+    return this.create(target, operation, {
+      jobId: makeUpidJobId(target, operation, upid),
+      relatedUpid: upid,
+    });
+  }
+
+  /** Returns the in-memory snapshot when present. */
+  find(jobId: string): ServerJob | undefined {
+    return this.jobs.get(jobId);
+  }
+
   /** Returns the current job snapshot or throws for an unknown job id. */
   get(jobId: string): ServerJob {
-    const job = this.jobs.get(jobId);
+    const job = this.find(jobId);
     if (!job) {
       throw new Error(`Unknown job '${jobId}'`);
     }

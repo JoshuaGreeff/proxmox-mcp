@@ -127,6 +127,14 @@ When validating a module, the preferred proof is:
 - read back the resulting state through MCP
 - record any gaps found in the module/tool surface
 
+## Deferred Job Boundary
+
+Deferred jobs are not uniformly durable.
+
+- UPID-backed tool calls can be resumed later through `job_get`, `job_wait`, `job_cancel`, and `job_logs`
+- process-run execution paths such as `proxmox_cli_run`, `proxmox_shell_run`, `proxmox_node_terminal_run`, and `proxmox_vm_guest_exec` remain tied to the current live server process
+- this repo does not create its own local durable job database; cross-session durability is only available where Proxmox already owns the underlying task
+
 ## Rules For Workarounds During Testing
 
 For Proxmox-related actions under module development:

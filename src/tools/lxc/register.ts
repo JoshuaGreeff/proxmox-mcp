@@ -36,8 +36,7 @@ export function registerLxcTools(context: ServerContext) {
       if (!response.upid) {
         return textResult(`LXC action ${action} completed`, response.data);
       }
-      const job = jobManager.create(target, `lxc:${action}`);
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, `lxc:${action}`, response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
