@@ -51,8 +51,7 @@ export function registerStorageTools(context: ServerContext) {
         return textResult(`Storage download to ${storage} completed`, response.data);
       }
 
-      const job = jobManager.create(target, "storage:download_url");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, "storage:download_url", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {

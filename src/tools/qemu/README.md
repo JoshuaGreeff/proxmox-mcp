@@ -34,6 +34,10 @@ Transport preference:
 - guest execution prefers guest-agent-capable paths and falls back to validated guest transport only when necessary
 - diagnostics may aggregate several low-level signals when that makes guest boot and guest-agent failures easier to isolate
 
+Job durability boundary:
+- UPID-backed VM lifecycle and config mutations can be followed later through `job_*`
+- `proxmox_vm_guest_exec` remains process-local when deferred because the server, not Proxmox, owns that execution path
+
 Validation boundary:
 - keep these tools as low-level VM primitives
 - allow bounded diagnostics tools that aggregate closely related VM signals, as long as their sources and fallbacks stay explicit

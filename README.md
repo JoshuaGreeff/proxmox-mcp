@@ -107,6 +107,13 @@ Completeness and escape hatches:
 
 Some tools now publish large text or binary outputs as MCP artifact resources instead of forcing everything inline into a single JSON response. Those artifacts are exposed under `proxmox://artifacts/{artifactId}`.
 
+Job durability boundary:
+
+- UPID-backed work is rehydratable through `job_get`, `job_wait`, `job_cancel`, and `job_logs` because Proxmox persists the underlying task
+- typical examples are VM lifecycle/config mutations, storage download-url jobs, backups, and other typed REST mutations that return a Proxmox UPID
+- process-run execution paths such as `proxmox_cli_run`, `proxmox_shell_run`, `proxmox_node_terminal_run`, and `proxmox_vm_guest_exec` remain process-local when deferred
+- this server does not create its own durable local job database; cross-session durability is only provided where Proxmox already owns it
+
 The validated boot/bootstrap findings behind the new VM diagnostics tools are tracked in [boot-and-bootstrap.md](./docs/proxmox/boot-and-bootstrap.md).
 
 ## Configuration

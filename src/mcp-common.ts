@@ -88,6 +88,7 @@ export function jobHandleResult(job: ServerJob, note?: string) {
     operation: job.operation,
     target: job.target,
     relatedUpid: job.relatedUpid,
+    durability: job.relatedUpid ? "proxmox_upid" : "process_local",
   });
 }
 
@@ -99,6 +100,7 @@ export function completedJobResult(job: ServerJob, note?: string) {
     operation: job.operation,
     target: job.target,
     relatedUpid: job.relatedUpid,
+    durability: job.relatedUpid ? "proxmox_upid" : "process_local",
     result: job.result,
     error: job.error,
     logs: job.logs.slice(-200),

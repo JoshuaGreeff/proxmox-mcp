@@ -104,8 +104,7 @@ export function registerQemuTools(context: ServerContext) {
         return textResult(`VM action ${action} completed`, response.data);
       }
 
-      const job = jobManager.create(target, `vm:${action}`);
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, `vm:${action}`, response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -124,7 +123,7 @@ export function registerQemuTools(context: ServerContext) {
   server.registerTool(
     "proxmox_vm_guest_exec",
     {
-      description: "Execute a command inside a QEMU VM using the guest agent or configured guest transport.",
+      description: "Execute a command inside a QEMU VM using the guest agent or configured guest transport. Deferred jobs for this execution path are process-local to the current server.",
       inputSchema: {
         cluster: clusterSchema,
         vmid: vmidSchema,
@@ -187,8 +186,7 @@ export function registerQemuTools(context: ServerContext) {
       if (!response.upid) {
         return textResult(`VM ${vmid} created`, response.data);
       }
-      const job = jobManager.create(target, "vm:create");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, "vm:create", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -220,8 +218,7 @@ export function registerQemuTools(context: ServerContext) {
       if (!response.upid) {
         return textResult(`VM ${vmid} config updated`, response.data);
       }
-      const job = jobManager.create(target, "vm:update_config");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, "vm:update_config", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -280,8 +277,7 @@ export function registerQemuTools(context: ServerContext) {
         return textResult(`VM ${vmid} PCI slot ${slot} attached`, { ...response, config: latest.config });
       }
 
-      const job = jobManager.create(target, "vm:pci_attach");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, "vm:pci_attach", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         const task = await service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -319,8 +315,7 @@ export function registerQemuTools(context: ServerContext) {
         return textResult(`VM ${vmid} PCI slot ${slot} detached`, { ...response, config: latest.config });
       }
 
-      const job = jobManager.create(target, "vm:pci_detach");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, "vm:pci_detach", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         const task = await service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -355,8 +350,7 @@ export function registerQemuTools(context: ServerContext) {
       if (!response.upid) {
         return textResult(`VM ${vmid} converted to template`, response.data);
       }
-      const job = jobManager.create(target, "vm:convert_to_template");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, "vm:convert_to_template", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -397,8 +391,7 @@ export function registerQemuTools(context: ServerContext) {
       if (!response.upid) {
         return textResult(`VM ${vmid} cloned to ${newid}`, response.data);
       }
-      const job = jobManager.create(targetRef, "vm:clone");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(targetRef, "vm:clone", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -443,8 +436,7 @@ export function registerQemuTools(context: ServerContext) {
       if (!response.upid) {
         return textResult(`VM ${vmid} destroyed`, response.data);
       }
-      const job = jobManager.create(target, "vm:destroy");
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, "vm:destroy", response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
