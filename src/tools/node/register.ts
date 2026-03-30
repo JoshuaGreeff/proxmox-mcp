@@ -49,8 +49,7 @@ export function registerNodeTools(context: ServerContext) {
         return textResult(`Node action ${action} completed`, response.data);
       }
 
-      const job = jobManager.create(target, `node:${action}`);
-      job.relatedUpid = response.upid;
+      const job = jobManager.createUpidJob(target, `node:${action}`, response.upid);
       jobManager.run(job.jobId, async (jobContext) => {
         jobContext.setRelatedUpid(response.upid!);
         return service.waitForUpid(cluster, response.upid!, pollIntervalMs ?? 2_000, jobContext.signal, async (progress) => {
@@ -79,7 +78,7 @@ export function registerNodeTools(context: ServerContext) {
   server.registerTool(
     "proxmox_node_terminal_run",
     {
-      description: "Run a stateless shell command on a Proxmox node and wait for completion or a background job handle.",
+      description: "Run a stateless shell command on a Proxmox node and wait for completion or a background job handle. Deferred jobs for this break-glass path are process-local to the current server.",
       inputSchema: {
         cluster: clusterSchema,
         node: z.string().min(1).describe("Proxmox node name."),

@@ -28,3 +28,9 @@ Transport preference:
 Validation boundary:
 - these tools exist to cover validated gaps and completeness
 - do not treat them as a substitute for adding generic typed domain primitives when a reusable Proxmox action is missing
+
+Job durability boundary:
+- UPID-backed jobs can be re-read later through `job_*` because Proxmox persists the underlying task
+- `proxmox_api_call` benefits from that only when the called endpoint actually returns a UPID
+- `proxmox_cli_run` and `proxmox_shell_run` remain break-glass execution paths, so deferred job handles for them are process-local
+- this tool does not add its own durable local job store
