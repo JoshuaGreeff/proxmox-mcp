@@ -17,12 +17,20 @@ For normal changes:
 
 1. branch from `dev`
 2. develop in a short-lived `feature/*` branch
-3. open a PR into `dev`
-4. let CI pass on `dev`
-5. merge into `dev`
-6. promote `dev` to `main` only when the integrated state is fully tested and ready for production
+3. if the work is tracked by a GitHub issue, keep that issue's implementation in its own dedicated branch and PR
+4. open a PR into `dev`
+5. link the PR back to the issue with `Refs #<issue>` so the issue stays open while the change is still only in `dev`
+6. let CI pass on `dev`
+7. merge into `dev`
+8. promote `dev` to `main` only when the integrated state is fully tested and ready for production
 
 The intent is to keep `main` stable while still giving maintainers a shared integration branch for in-flight work.
+
+Issue handling rule:
+
+- treat the issue as open work until the change reaches `main`
+- merging into `dev` is integration, not final closure
+- close the issue when the relevant promotion to `main` lands, either manually or by using an auto-closing keyword on the `dev` -> `main` PR when that is what you want
 
 ## Release Promotion
 
