@@ -48,5 +48,9 @@ When opening a PR:
 
 - target `dev` for normal work
 - target `main` only for release promotions from `dev` or urgent `hotfix/*` work
+- when work is tracked by a GitHub issue, keep that work in a dedicated issue-owned branch and PR
+- prefer branch names that keep the issue association obvious, for example `feature/issue-13-pci-passthrough`
+- use `Refs #<issue>` while the work is still in `dev` or under review so the issue stays open during integration
+- close the issue when the change is actually promoted to `main`, either manually or through the `main` promotion PR if you intentionally want GitHub to auto-close it at that point
 - summarize operator-visible behavior changes clearly
 - call out any high-risk shell, file, or mutation-path changes explicitly
