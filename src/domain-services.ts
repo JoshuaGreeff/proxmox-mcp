@@ -1,4 +1,4 @@
-import type { ProxmoxService, VmCloneOptions } from "./services.js";
+import type { ProxmoxService, VmCloneOptions, VmPciPassthroughOptions } from "./services.js";
 import type { TargetRef } from "./types.js";
 import { buildOfflineVmBootInspectionScript, parseOfflineVmBootInspection } from "./boot/diagnostics.js";
 import type { BootstrapStack, OfflineBootInspection } from "./boot/types.js";
@@ -141,6 +141,16 @@ export class QemuDomainService {
   /** Uses: `/nodes/{node}/qemu/{vmid}/config`. */
   updateConfig(cluster: string, vmid: number, args: Record<string, unknown>, node?: string, timeoutMs?: number, signal?: AbortSignal) {
     return this.service.vmUpdateConfig(cluster, vmid, args, node, timeoutMs, signal);
+  }
+
+  /** Uses: `/nodes/{node}/qemu/{vmid}/config` with `qm set` fallback for root-only raw hostpci updates. */
+  attachPci(cluster: string, vmid: number, options: VmPciPassthroughOptions, node?: string, timeoutMs?: number, signal?: AbortSignal) {
+    return this.service.vmAttachPciDevice(cluster, vmid, options, node, timeoutMs, signal);
+  }
+
+  /** Uses: `/nodes/{node}/qemu/{vmid}/config` delete semantics with `qm set -delete` fallback if needed. */
+  detachPci(cluster: string, vmid: number, slot: number, node?: string, timeoutMs?: number, signal?: AbortSignal) {
+    return this.service.vmDetachPciDevice(cluster, vmid, slot, node, timeoutMs, signal);
   }
 
   /** Uses: `/nodes/{node}/qemu/{vmid}/clone`. */

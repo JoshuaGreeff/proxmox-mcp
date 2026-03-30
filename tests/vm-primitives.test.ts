@@ -172,6 +172,115 @@ describe("low-level VM primitives", () => {
     );
   });
 
+  it("attaches a PCI device through the REST config path when Proxmox accepts the update", async () => {
+    const service = makeService();
+    vi.spyOn(service as any, "getVmLocation").mockResolvedValue({ id: "qemu/9020", type: "qemu", node: "pve-example", vmid: 9020 });
+    const proxmoxApiCall = vi.spyOn(service, "proxmoxApiCall").mockResolvedValue({ data: "UPID:pciattach", upid: "UPID:pciattach" });
+
+    const result = await service.vmAttachPciDevice(
+      "lab",
+      9020,
+      {
+        slot: 1,
+        host: "0000:22:00",
+        pcie: true,
+        rombar: false,
+      },
+      undefined,
+      60_000,
+    );
+
+    expect(proxmoxApiCall).toHaveBeenCalledWith(
+      { cluster: "lab", kind: "qemu_vm", node: "pve-example", vmid: 9020 },
+      "PUT",
+      "/nodes/pve-example/qemu/9020/config",
+      {
+        hostpci1: "host=0000:22:00,pcie=1,rombar=0",
+      },
+      60_000,
+      undefined,
+    );
+    expect(result).toMatchObject({
+      cluster: "lab",
+      node: "pve-example",
+      vmid: 9020,
+      slot: 1,
+      configKey: "hostpci1",
+      configValue: "host=0000:22:00,pcie=1,rombar=0",
+      appliedVia: "rest",
+      upid: "UPID:pciattach",
+    });
+  });
+
+  it("falls back to qm set for raw hostpci updates when Proxmox reports the known root-only non-mapped-device error", async () => {
+    const service = makeService();
+    vi.spyOn(service as any, "getVmLocation").mockResolvedValue({ id: "qemu/9020", type: "qemu", node: "pve-example", vmid: 9020 });
+    vi.spyOn(service, "proxmoxApiCall").mockRejectedValue(new Error("500 only root can set 'hostpci1' config for non-mapped devices"));
+    const proxmoxCliRun = vi.spyOn(service, "proxmoxCliRun").mockResolvedValue({
+      stdout: "",
+      stderr: "",
+      exitCode: 0,
+    });
+
+    const result = await service.vmAttachPciDevice(
+      "lab",
+      9020,
+      {
+        slot: 1,
+        host: "0000:22:00",
+        pcie: true,
+      },
+      undefined,
+      60_000,
+    );
+
+    expect(proxmoxCliRun).toHaveBeenCalledWith(
+      { cluster: "lab", kind: "node", node: "pve-example" },
+      "qm",
+      ["set", "9020", "-hostpci1", "host=0000:22:00,pcie=1"],
+      undefined,
+      60_000,
+      undefined,
+    );
+    expect(result).toMatchObject({
+      cluster: "lab",
+      node: "pve-example",
+      vmid: 9020,
+      slot: 1,
+      configKey: "hostpci1",
+      configValue: "host=0000:22:00,pcie=1",
+      appliedVia: "qm_cli_fallback",
+    });
+  });
+
+  it("detaches a PCI slot through the REST config path", async () => {
+    const service = makeService();
+    vi.spyOn(service as any, "getVmLocation").mockResolvedValue({ id: "qemu/9020", type: "qemu", node: "pve-example", vmid: 9020 });
+    const proxmoxApiCall = vi.spyOn(service, "proxmoxApiCall").mockResolvedValue({ data: "UPID:pcidetach", upid: "UPID:pcidetach" });
+
+    const result = await service.vmDetachPciDevice("lab", 9020, 1, undefined, 60_000);
+
+    expect(proxmoxApiCall).toHaveBeenCalledWith(
+      { cluster: "lab", kind: "qemu_vm", node: "pve-example", vmid: 9020 },
+      "PUT",
+      "/nodes/pve-example/qemu/9020/config",
+      {
+        delete: "hostpci1",
+      },
+      60_000,
+      undefined,
+    );
+    expect(result).toMatchObject({
+      cluster: "lab",
+      node: "pve-example",
+      vmid: 9020,
+      slot: 1,
+      configKey: "hostpci1",
+      appliedVia: "rest",
+      upid: "UPID:pcidetach",
+    });
+  });
+
   it("converts a VM to a template through the low-level template primitive", async () => {
     const service = makeService();
     const proxmoxApiCall = vi.spyOn(service, "proxmoxApiCall").mockResolvedValue({ data: "UPID:template", upid: "UPID:template" });
