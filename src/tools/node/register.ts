@@ -2,11 +2,12 @@ import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { commonExecutionSchema, completedJobResult, emitProgress, jobHandleResult, settleJob, textResult } from "../../mcp-common.js";
 import type { TargetRef } from "../../types.js";
+import { createClusterSchema, createCommandStringSchema } from "../../tool-inputs.js";
 
 /** Registers node-scoped lifecycle, status, network, and terminal primitives. */
 export function registerNodeTools(context: ServerContext) {
   const { server, domains, service, jobManager } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
+  const clusterSchema = createClusterSchema(context.config);
   const nodeSchema = z.string().describe("Proxmox node name.");
 
   // Uses: `/nodes` with inventory-backed capability discovery.
@@ -78,11 +79,11 @@ export function registerNodeTools(context: ServerContext) {
   server.registerTool(
     "proxmox_node_terminal_run",
     {
-      description: "Run a stateless shell command on a Proxmox node and wait for completion or a background job handle. Deferred jobs for this break-glass path are process-local to the current server.",
+      description: "Run a stateless shell command on a Proxmox node and wait for completion or a background job handle. Pass `command` as one string such as `uname -a` and choose `interpreter` separately. Deferred jobs for this break-glass path are process-local to the current server.",
       inputSchema: {
         cluster: clusterSchema,
         node: z.string().min(1).describe("Proxmox node name."),
-        command: z.string().min(1),
+        command: createCommandStringSchema("Single command string to run on the node. Example: `command: \"uname -a\", interpreter: \"bash\"`."),
         interpreter: z.enum(["sh", "bash", "powershell", "cmd"]).default("sh"),
         useSudo: z.boolean().default(false),
         ...commonExecutionSchema,

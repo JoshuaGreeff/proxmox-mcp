@@ -70,6 +70,12 @@ Do not rely on editor reload behavior as the main proof that a module works.
 
 ## Example: Direct MCP Read
 
+Calling-convention reminders before you test:
+
+- when the server has exactly one configured cluster, tool calls may omit `cluster`
+- `vmid` may be passed as `100` or `"100"`
+- guest and shell execution tools take a single `command` string plus an `interpreter`, not argv arrays
+
 This pattern queries the live server directly from the repo without adding the MCP server to an external agent handler:
 
 ```powershell
@@ -79,7 +85,6 @@ import { createLiveClient, callToolRecord } from "./tests/live/mcp-live-helpers.
 const client = await createLiveClient();
 try {
   const data = await callToolRecord(client, "proxmox_vm_list", {
-    cluster: "default",
   });
   console.log(JSON.stringify(data, null, 2));
 } finally {
@@ -106,13 +111,13 @@ import { createLiveClient, callToolRecord } from "./tests/live/mcp-live-helpers.
 
 const client = await createLiveClient();
 try {
-  const result = await callToolRecord(client, "proxmox_vm_action", {
+  const result = await callToolRecord(client, "proxmox_vm_guest_exec", {
     cluster: "default",
-    vmid: 94207,
-    action: "stop",
+    vmid: "94207",
+    command: "uname -a",
+    interpreter: "bash",
     waitMode: "wait",
     timeoutMs: 120000,
-    pollIntervalMs: 1000,
   });
   console.log(JSON.stringify(result, null, 2));
 } finally {

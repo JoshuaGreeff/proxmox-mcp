@@ -21,6 +21,10 @@ Transport preference:
 - REST first
 - no SSH fallback for the current tools in this folder
 
+Calling conventions:
+- when the server has exactly one configured cluster, the typed `cluster` input may be omitted and the server will use that sole configured alias
+- when multiple clusters are configured, callers should pass an explicit configured alias such as `default`
+
 Validation boundary:
 - keep these tools low-level and close to cluster resource semantics
 - do not add bundled operator workflows here

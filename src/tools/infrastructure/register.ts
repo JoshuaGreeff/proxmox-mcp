@@ -2,12 +2,14 @@ import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { commonExecutionSchema, completedJobResult, emitProgress, jobHandleResult, settleJob, textResult } from "../../mcp-common.js";
 import type { TargetRef } from "../../types.js";
+import { createClusterSchema, createVmidSchema } from "../../tool-inputs.js";
 
 /** Registers cross-cutting infrastructure primitives that do not yet justify narrower folders. */
 export function registerInfrastructureTools(context: ServerContext) {
   const { server, domains, service, jobManager } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
+  const clusterSchema = createClusterSchema(context.config);
   const nodeSchema = z.string().describe("Proxmox node name.");
+  const vmidSchema = createVmidSchema("QEMU VM or LXC CT numeric ID.");
 
   // Uses: cluster, node, QEMU, and LXC firewall endpoint families.
   server.registerTool(
@@ -18,7 +20,7 @@ export function registerInfrastructureTools(context: ServerContext) {
         cluster: clusterSchema,
         scope: z.enum(["cluster", "node", "qemu_vm", "lxc_container"]),
         node: z.string().optional(),
-        vmid: z.number().int().positive().optional(),
+        vmid: vmidSchema.optional(),
         section: z.enum(["options", "rules", "aliases", "ipset", "log", "refs"]).default("options"),
       },
     },
@@ -63,7 +65,7 @@ export function registerInfrastructureTools(context: ServerContext) {
       inputSchema: {
         cluster: clusterSchema,
         node: nodeSchema,
-        vmid: z.array(z.number().int().positive()).optional(),
+        vmid: z.array(vmidSchema).optional(),
         storage: z.string().optional(),
         mode: z.enum(["snapshot", "suspend", "stop"]).optional(),
         compress: z.string().optional(),
@@ -146,7 +148,7 @@ export function registerInfrastructureTools(context: ServerContext) {
         cluster: clusterSchema,
         targetKind: z.enum(["node", "qemu_vm", "lxc_container"]),
         node: z.string().optional(),
-        vmid: z.number().int().positive().optional(),
+        vmid: vmidSchema.optional(),
         scope: z.enum(["shell", "vnc"]).default("shell"),
       },
     },

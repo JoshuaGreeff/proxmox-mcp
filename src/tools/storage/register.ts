@@ -2,12 +2,14 @@ import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { artifactResult, commonExecutionSchema, completedJobResult, emitProgress, jobHandleResult, settleJob, textResult } from "../../mcp-common.js";
 import type { TargetRef } from "../../types.js";
+import { createClusterSchema, createVmidSchema } from "../../tool-inputs.js";
 
 /** Registers storage and cloud-init snippet primitives. */
 export function registerStorageTools(context: ServerContext) {
   const { server, domains, service, jobManager, artifacts } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
+  const clusterSchema = createClusterSchema(context.config);
   const nodeSchema = z.string().describe("Proxmox node name.");
+  const vmidSchema = createVmidSchema("QEMU VM numeric ID.");
 
   server.registerTool("proxmox_storage_list", { description: "List storages visible to the cluster.", inputSchema: { cluster: clusterSchema } }, async ({ cluster }) =>
     textResult(`Storages for ${cluster}`, (await domains.storage.list(cluster)).data),
@@ -112,7 +114,7 @@ export function registerStorageTools(context: ServerContext) {
   server.registerTool(
     "proxmox_cloud_init_snippet_put",
     {
-      description: "Write a cloud-init snippet onto snippet-capable Proxmox storage.",
+      description: "Write a cloud-init snippet onto snippet-capable Proxmox storage. Use either inline `content` for small text or `artifactId`/`resourceUri` for artifact-backed writes.",
       inputSchema: {
         cluster: clusterSchema,
         node: z.string().optional(),
@@ -124,8 +126,9 @@ export function registerStorageTools(context: ServerContext) {
       },
     },
     async ({ cluster, node, storage, snippetPath, content, artifactId, resourceUri }, extra) => {
-      if (content === undefined && !artifactId && !resourceUri) {
-        throw new Error("Snippet write requires content, artifactId, or resourceUri");
+      const providedSources = [content !== undefined, Boolean(artifactId), Boolean(resourceUri)].filter(Boolean).length;
+      if (providedSources !== 1) {
+        throw new Error("Snippet write requires exactly one content source: inline content, artifactId, or resourceUri.");
       }
       const resolvedContent = artifactId || resourceUri ? await artifacts.readArtifactText({ artifactId, resourceUri }, service) : content!;
       return textResult(`Cloud-init snippet ${snippetPath} written`, await domains.storage.putSnippet(cluster, node, storage, snippetPath, resolvedContent, extra.signal));
@@ -155,7 +158,7 @@ export function registerStorageTools(context: ServerContext) {
       description: "Dump the generated cloud-init user, network, or meta config for a VM or template.",
       inputSchema: {
         cluster: clusterSchema,
-        vmid: z.number().int().positive(),
+        vmid: vmidSchema,
         section: z.enum(["user", "network", "meta"]).default("user"),
       },
     },

@@ -2,18 +2,19 @@ import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { textResult } from "../../mcp-common.js";
 import { commonExecutionSchema } from "../../mcp-common.js";
+import { createClusterSchema } from "../../tool-inputs.js";
 
 /** Registers cluster-scoped inventory and status primitives. */
 export function registerClusterTools(context: ServerContext) {
   const { server, domains } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
+  const clusterSchema = createClusterSchema(context.config);
   const pciMappingIdSchema = z.string().describe("Logical cluster-wide PCI mapping ID.");
 
   // Uses: `/cluster/resources`, `/cluster/status`, and `/version` through the cluster domain service.
   server.registerTool(
     "proxmox_inventory_overview",
     {
-      description: "Return cluster inventory and discovered capabilities for nodes, VMs, containers, and storages.",
+      description: "Return cluster inventory and discovered capabilities for nodes, VMs, containers, and storages. In a single-cluster setup, `cluster` may be omitted.",
       inputSchema: {
         cluster: clusterSchema,
         probeRemote: z.boolean().default(false).describe("Whether to probe for docker and remote shell reachability where possible."),
@@ -28,7 +29,7 @@ export function registerClusterTools(context: ServerContext) {
   server.registerTool(
     "proxmox_cluster_status",
     {
-      description: "Return cluster status and version information.",
+      description: "Return cluster status and version information for a configured cluster alias. In a single-cluster setup, `cluster` may be omitted.",
       inputSchema: { cluster: clusterSchema },
     },
     async ({ cluster }) => textResult(`Cluster status for ${cluster}`, await domains.cluster.getStatus(cluster)),
