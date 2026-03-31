@@ -1,11 +1,11 @@
-import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { textResult } from "../../mcp-common.js";
+import { createClusterSchema } from "../../tool-inputs.js";
 
 /** Registers access and identity primitives. */
 export function registerAccessTools(context: ServerContext) {
   const { server, domains } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
+  const clusterSchema = createClusterSchema(context.config);
 
   // Uses: `/access/users`.
   server.registerTool(

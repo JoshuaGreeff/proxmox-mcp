@@ -38,6 +38,12 @@ Job durability boundary:
 - UPID-backed VM lifecycle and config mutations can be followed later through `job_*`
 - `proxmox_vm_guest_exec` remains process-local when deferred because the server, not Proxmox, owns that execution path
 
+Calling conventions:
+- `vmid` accepts either an integer like `100` or a digit-only string like `"100"`
+- in single-cluster deployments, callers may omit `cluster`
+- `proxmox_vm_guest_exec.command` is one command string and `interpreter` chooses the shell
+- do not pass argv arrays to `proxmox_vm_guest_exec`; use `command: "uname -a", interpreter: "bash"` instead
+
 Validation boundary:
 - keep these tools as low-level VM primitives
 - allow bounded diagnostics tools that aggregate closely related VM signals, as long as their sources and fallbacks stay explicit

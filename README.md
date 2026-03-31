@@ -114,6 +114,73 @@ Job durability boundary:
 - process-run execution paths such as `proxmox_cli_run`, `proxmox_shell_run`, `proxmox_node_terminal_run`, and `proxmox_vm_guest_exec` remain process-local when deferred
 - this server does not create its own durable local job database; cross-session durability is only provided where Proxmox already owns it
 
+Common calling conventions:
+
+- `cluster` may be omitted only when the server has exactly one configured cluster; otherwise pass a configured alias such as `default`
+- `vmid` accepts either an integer like `100` or a digit-only string like `"100"`
+- `proxmox_vm_guest_exec.command`, `proxmox_shell_run.command`, and `proxmox_node_terminal_run.command` take one command string, not argv arrays
+- `proxmox_file_write` and `proxmox_cloud_init_snippet_put` expect exactly one content source: inline `content`, `artifactId`, or `resourceUri`
+
+Quick examples:
+
+```json
+{
+  "tool": "proxmox_inventory_overview",
+  "arguments": {
+    "probeRemote": false
+  }
+}
+```
+
+```json
+{
+  "tool": "proxmox_vm_get",
+  "arguments": {
+    "cluster": "default",
+    "vmid": "100"
+  }
+}
+```
+
+```json
+{
+  "tool": "proxmox_vm_guest_exec",
+  "arguments": {
+    "cluster": "default",
+    "vmid": 100,
+    "command": "uname -a",
+    "interpreter": "bash",
+    "waitMode": "wait"
+  }
+}
+```
+
+```json
+{
+  "tool": "proxmox_shell_run",
+  "arguments": {
+    "cluster": "default",
+    "targetKind": "node",
+    "node": "pve01",
+    "command": "qm list",
+    "interpreter": "bash"
+  }
+}
+```
+
+```json
+{
+  "tool": "proxmox_file_write",
+  "arguments": {
+    "cluster": "default",
+    "targetKind": "qemu_vm",
+    "vmid": 100,
+    "filePath": "/tmp/hello.txt",
+    "content": "hello from proxmox-mcp\n"
+  }
+}
+```
+
 The validated boot/bootstrap findings behind the new VM diagnostics tools are tracked in [boot-and-bootstrap.md](./docs/proxmox/boot-and-bootstrap.md).
 
 ## Configuration

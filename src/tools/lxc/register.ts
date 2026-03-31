@@ -2,12 +2,13 @@ import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { commonExecutionSchema, completedJobResult, emitProgress, jobHandleResult, settleJob, textResult } from "../../mcp-common.js";
 import type { TargetRef } from "../../types.js";
+import { createClusterSchema, createVmidSchema } from "../../tool-inputs.js";
 
 /** Registers LXC container primitives. */
 export function registerLxcTools(context: ServerContext) {
   const { server, domains, service, jobManager } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
-  const vmidSchema = z.number().int().positive().describe("QEMU VM or LXC CT numeric ID.");
+  const clusterSchema = createClusterSchema(context.config);
+  const vmidSchema = createVmidSchema("QEMU VM or LXC CT numeric ID.");
 
   server.registerTool("proxmox_lxc_list", { description: "List Linux containers in a cluster.", inputSchema: { cluster: clusterSchema } }, async ({ cluster }) =>
     textResult(`LXC containers for ${cluster}`, await domains.lxc.list(cluster)),

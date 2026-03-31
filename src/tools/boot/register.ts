@@ -1,12 +1,13 @@
 import type { ServerContext } from "../../mcp-common.js";
 import { textResult } from "../../mcp-common.js";
 import { z } from "zod";
+import { createClusterSchema, createVmidSchema } from "../../tool-inputs.js";
 
 /** Registers VM boot diagnostics tools. */
 export function registerBootTools(context: ServerContext) {
   const { server, domains } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
-  const vmidSchema = z.number().int().positive().describe("QEMU VM numeric ID.");
+  const clusterSchema = createClusterSchema(context.config);
+  const vmidSchema = createVmidSchema("QEMU VM numeric ID.");
 
   /**
    * Uses:

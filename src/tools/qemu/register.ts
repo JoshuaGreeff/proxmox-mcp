@@ -2,13 +2,14 @@ import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { commonExecutionSchema, completedJobResult, emitProgress, jobHandleResult, settleJob, textResult } from "../../mcp-common.js";
 import type { TargetRef } from "../../types.js";
+import { createClusterSchema, createCommandStringSchema, createVmidSchema } from "../../tool-inputs.js";
 
 /** Registers QEMU VM, guest, and template primitives. */
 export function registerQemuTools(context: ServerContext) {
   const { server, domains, service, jobManager } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
+  const clusterSchema = createClusterSchema(context.config);
   const nodeSchema = z.string().describe("Proxmox node name.");
-  const vmidSchema = z.number().int().positive().describe("QEMU VM numeric ID.");
+  const vmidSchema = createVmidSchema("QEMU VM numeric ID.");
   const pciSlotSchema = z.number().int().nonnegative().describe("Host PCI slot index, for example `0` for `hostpci0`.");
 
   // Uses: inventory discovery for QEMU VMs.
@@ -17,7 +18,7 @@ export function registerQemuTools(context: ServerContext) {
   );
 
   // Uses: inventory discovery plus `/nodes/{node}/qemu/{vmid}/status/current` and `/nodes/{node}/qemu/{vmid}/config`.
-  server.registerTool("proxmox_vm_get", { description: "Get QEMU VM status and config.", inputSchema: { cluster: clusterSchema, vmid: vmidSchema } }, async ({ cluster, vmid }) =>
+  server.registerTool("proxmox_vm_get", { description: "Get QEMU VM status and config. `vmid` accepts either `100` or `\"100\"`.", inputSchema: { cluster: clusterSchema, vmid: vmidSchema } }, async ({ cluster, vmid }) =>
     textResult(`VM ${vmid}`, await domains.qemu.get(cluster, vmid)),
   );
 
@@ -123,11 +124,11 @@ export function registerQemuTools(context: ServerContext) {
   server.registerTool(
     "proxmox_vm_guest_exec",
     {
-      description: "Execute a command inside a QEMU VM using the guest agent or configured guest transport. Deferred jobs for this execution path are process-local to the current server.",
+      description: "Execute a command inside a QEMU VM using the guest agent or configured guest transport. `command` must be a single command string such as `uname -a`; use `interpreter` to select `bash`, `sh`, `powershell`, or `cmd`, and do not pass argv arrays. Deferred jobs for this execution path are process-local to the current server.",
       inputSchema: {
         cluster: clusterSchema,
         vmid: vmidSchema,
-        command: z.string().min(1),
+        command: createCommandStringSchema("Single command string to run inside the guest. Example: `command: \"uname -a\", interpreter: \"bash\"`."),
         interpreter: z.enum(["sh", "bash", "powershell", "cmd"]).default("sh"),
         ...commonExecutionSchema,
       },

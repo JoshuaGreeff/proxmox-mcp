@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { ServerContext } from "../../mcp-common.js";
 import { artifactResult, commonExecutionSchema, completedJobResult, emitProgress, jobHandleResult, settleJob, textResult } from "../../mcp-common.js";
 import { parseUpidJobId } from "../../jobs.js";
+import { createClusterSchema, createCommandStringSchema, createVmidSchema } from "../../tool-inputs.js";
 import { CAPABILITY_NAMES, type JobState, type ServerJob, type TargetRef } from "../../types.js";
 import { nowIso, sleep } from "../../utils.js";
 
@@ -114,8 +115,9 @@ async function waitForUpidJobSnapshot(context: ServerContext, jobId: string, tim
 /** Registers generic REST/CLI/shell escape hatches plus MCP resources, prompts, and job tools. */
 export function registerEscapeTools(context: ServerContext) {
   const { server, service, jobManager, artifacts } = context;
-  const clusterSchema = z.string().describe("Configured cluster alias.");
+  const clusterSchema = createClusterSchema(context.config);
   const targetKindSchema = z.enum(["node", "qemu_vm", "lxc_container", "linux_guest", "windows_guest"]);
+  const vmidSchema = createVmidSchema("QEMU VM or LXC CT numeric ID.");
 
   server.registerResource(
     "artifact-resource",
@@ -245,13 +247,13 @@ export function registerEscapeTools(context: ServerContext) {
   server.registerTool(
     "proxmox_shell_run",
     {
-      description: "Run a policy-gated shell command against a node or guest transport. Deferred jobs for this break-glass path are process-local to the current server.",
+      description: "Run a policy-gated shell command against a node or guest transport. `command` must be one shell string and `interpreter` chooses `sh`, `bash`, `powershell`, or `cmd`; do not pass argv arrays. Deferred jobs for this break-glass path are process-local to the current server.",
       inputSchema: {
         cluster: clusterSchema,
         targetKind: targetKindSchema,
         node: z.string().optional(),
-        vmid: z.number().int().positive().optional(),
-        command: z.string().min(1),
+        vmid: vmidSchema.optional(),
+        command: createCommandStringSchema("Single command string to run through the selected interpreter. Example: `command: \"uname -a\", interpreter: \"bash\"`."),
         interpreter: z.enum(["sh", "bash", "powershell", "cmd"]).default("sh"),
         useSudo: z.boolean().default(false),
         ...commonExecutionSchema,
@@ -284,7 +286,7 @@ export function registerEscapeTools(context: ServerContext) {
     "proxmox_file_read",
     {
       description: "Read a file through the best supported transport for the target.",
-      inputSchema: { cluster: clusterSchema, targetKind: targetKindSchema, node: z.string().optional(), vmid: z.number().int().positive().optional(), filePath: z.string().min(1) },
+      inputSchema: { cluster: clusterSchema, targetKind: targetKindSchema, node: z.string().optional(), vmid: vmidSchema.optional(), filePath: z.string().min(1) },
     },
     async ({ cluster, targetKind, node, vmid, filePath }) => {
       const target: TargetRef = { cluster, kind: targetKind, ...(node ? { node } : {}), ...(vmid !== undefined ? { vmid } : {}) };
@@ -302,12 +304,12 @@ export function registerEscapeTools(context: ServerContext) {
   server.registerTool(
     "proxmox_file_write",
     {
-      description: "Write a file through the best supported transport for the target.",
+      description: "Write a file through the best supported transport for the target. Provide exactly one content source: inline `content`, `artifactId`, or `resourceUri`.",
       inputSchema: {
         cluster: clusterSchema,
         targetKind: targetKindSchema,
         node: z.string().optional(),
-        vmid: z.number().int().positive().optional(),
+        vmid: vmidSchema.optional(),
         filePath: z.string().min(1),
         content: z.string().optional().describe("Inline UTF-8 file content for small text writes."),
         artifactId: z.string().optional().describe("Optional server artifact id to write instead of inline content."),
@@ -315,8 +317,9 @@ export function registerEscapeTools(context: ServerContext) {
       },
     },
     async ({ cluster, targetKind, node, vmid, filePath, content, artifactId, resourceUri }) => {
-      if (content === undefined && !artifactId && !resourceUri) {
-        throw new Error("File write requires content, artifactId, or resourceUri");
+      const providedSources = [content !== undefined, Boolean(artifactId), Boolean(resourceUri)].filter(Boolean).length;
+      if (providedSources !== 1) {
+        throw new Error("File write requires exactly one content source: inline content, artifactId, or resourceUri.");
       }
       const target: TargetRef = { cluster, kind: targetKind, ...(node ? { node } : {}), ...(vmid !== undefined ? { vmid } : {}) };
       if (artifactId || resourceUri) {
